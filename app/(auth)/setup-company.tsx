@@ -1,0 +1,541 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera, Upload, ArrowLeft } from 'lucide-react-native';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { BusinessCategory, ChristianDuration } from '@/types';
+import { Colors, Spacing, Typography, BorderRadius } from '@/constants/Colors';
+import { SOUTH_AFRICAN_CITIES, formatPhoneNumber, displayPhoneNumber } from '@/constants/SouthAfricaData';
+
+const businessCategories: BusinessCategory[] = [
+  'Retail', 'Consulting', 'Technology', 'Healthcare', 'Education',
+  'Construction', 'Food & Beverage', 'Professional Services',
+  'Manufacturing', 'Transportation', 'Real Estate', 'Finance',
+  'Media & Marketing', 'Other'
+];
+
+const christianDurations: ChristianDuration[] = [
+  '<1 year', '1-5 years', '5-10 years', '>10 years'
+];
+
+export default function SetupCompanyScreen() {
+  const { authState, createCompany } = useAuth();
+  const { user } = authState;
+
+  const [formData, setFormData] = useState({
+    businessName: '',
+    ownerName: user ? `${user.firstName} ${user.lastName}` : '',
+    email: user?.email || '',
+    phone: user?.phone ? displayPhoneNumber(user.phone) : '',
+    whatsappNumber: user?.phone ? displayPhoneNumber(user.phone) : '',
+    city: '',
+    category: 'Other' as BusinessCategory,
+    website: '',
+    description: '',
+    faithAffirmation: false,
+    churchName: '',
+    christianDuration: '<1 year' as ChristianDuration,
+    churchInvolvement: '',
+    profileImage: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required';
+    if (!formData.ownerName.trim()) newErrors.ownerName = 'Owner name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^[0-9]{9,10}$/.test(formData.phone.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.phone = 'Please enter a valid South African phone number';
+    }
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.description.trim()) {
+      newErrors.description = 'Business description is required';
+    } else if (formData.description.length < 10) {
+      newErrors.description = 'Description must be at least 10 characters';
+    } else if (formData.description.length > 500) {
+      newErrors.description = 'Description must be less than 500 characters';
+    }
+    if (!formData.faithAffirmation) {
+      newErrors.faithAffirmation = 'Faith affirmation is required';
+    }
+    if (!formData.churchName.trim()) newErrors.churchName = 'Church name is required';
+
+    setErrors(newErrors);
+    
+    // Highlight first error field
+    const errorFields = ['businessName', 'ownerName', 'email', 'phone', 'city', 'description', 'faithAffirmation', 'churchName'];
+    const firstError = errorFields.find(field => newErrors[field]);
+    if (firstError) {
+      Alert.alert('Validation Error', newErrors[firstError]);
+      return false;
+    }
+    
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    const companyData = {
+      ...formData,
+      phone: formatPhoneNumber(formData.phone),
+      whatsappNumber: formData.whatsappNumber ? formatPhoneNumber(formData.whatsappNumber) : undefined,
+      location: `${formData.city}, South Africa`,
+      country: 'South Africa',
+    };
+
+    try {
+      const success = await createCompany(companyData);
+      if (success) {
+        Alert.alert(
+          'Application Submitted',
+          'Your company profile has been submitted for review. You will receive an email notification once it\'s approved.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        Alert.alert('Submission Failed', 'Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while submitting your application.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const updateField = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handlePhoneChange = (field: string, value: string) => {
+    const cleaned = value.replace(/[^\d]/g, '');
+    updateField(field, cleaned);
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please grant camera roll permissions to upload an image.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      updateField('profileImage', result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please grant camera permissions to take a photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      updateField('profileImage', result.assets[0].uri);
+    }
+  };
+
+  const showImagePicker = () => {
+    Alert.alert(
+      'Select Image',
+      'Choose how you want to add a business photo',
+      [
+        { text: 'Camera', onPress: takePhoto },
+        { text: 'Photo Library', onPress: pickImage },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const cityOptions = [
+    { label: 'Select a city', value: '' },
+    ...SOUTH_AFRICAN_CITIES.map(city => ({ label: city, value: city }))
+  ];
+
+  const categoryOptions = businessCategories.map(category => ({ 
+    label: category, 
+    value: category 
+  }));
+
+  const durationOptions = christianDurations.map(duration => ({ 
+    label: duration, 
+    value: duration 
+  }));
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.background}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={24} color={Colors.gray900} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Setup Company Profile</Text>
+          <View style={styles.placeholder} />
+        </View>
+        
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.subtitle}>Complete your business information for approval</Text>
+
+          <View style={styles.formContainer}>
+            {/* Business Image Upload */}
+            <View style={styles.imageSection}>
+              <Text style={styles.imageLabel}>Business Photo</Text>
+              <TouchableOpacity style={styles.imageUpload} onPress={showImagePicker}>
+                {formData.profileImage ? (
+                  <Image source={{ uri: formData.profileImage }} style={styles.uploadedImage} />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Upload size={32} color={Colors.gray400} />
+                    <Text style={styles.imagePlaceholderText}>Add Photo</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <Input
+              label="Business Name"
+              value={String(formData.businessName)}
+              onChangeText={(text) => updateField('businessName', text)}
+              placeholder="Your Business Name"
+              error={errors.businessName}
+              required
+            />
+
+            <Input
+              label="Owner's Name"
+              value={String(formData.ownerName)}
+              onChangeText={(text) => updateField('ownerName', text)}
+              placeholder="Full Name"
+              error={errors.ownerName}
+              required
+            />
+
+            <Input
+              label="Business Email"
+              value={String(formData.email)}
+              onChangeText={(text) => updateField('email', text)}
+              placeholder="business@example.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={errors.email}
+              required
+            />
+
+            <View style={styles.phoneContainer}>
+              <Text style={styles.phoneLabel}>
+                Phone Number <Text style={styles.required}>*</Text>
+              </Text>
+              <View style={styles.phoneInputContainer}>
+                <View style={styles.countryCode}>
+                  <Text style={styles.countryCodeText}>+27</Text>
+                </View>
+                <Input
+                  value={String(formData.phone)}
+                  onChangeText={(value) => handlePhoneChange('phone', value)}
+                  placeholder="82 123 4567"
+                  keyboardType="phone-pad"
+                  error={errors.phone}
+                  containerStyle={styles.phoneInput}
+                />
+              </View>
+            </View>
+
+            <View style={styles.phoneContainer}>
+              <Text style={styles.phoneLabel}>WhatsApp Number</Text>
+              <View style={styles.phoneInputContainer}>
+                <View style={styles.countryCode}>
+                  <Text style={styles.countryCodeText}>+27</Text>
+                </View>
+                <Input
+                  value={String(formData.whatsappNumber)}
+                  onChangeText={(value) => handlePhoneChange('whatsappNumber', value)}
+                  placeholder="82 123 4567"
+                  keyboardType="phone-pad"
+                  containerStyle={styles.phoneInput}
+                />
+              </View>
+            </View>
+
+            <Input
+              label="City"
+              type="select"
+              options={cityOptions}
+              value={String(formData.city)}
+              onValueChange={(value) => updateField('city', value)}
+              error={errors.city}
+              required
+            />
+
+            <Input
+              label="Business Category"
+              type="select"
+              options={categoryOptions}
+              value={String(formData.category)}
+              onValueChange={(value) => updateField('category', value)}
+              required
+            />
+
+            <Input
+              label="Website"
+              value={String(formData.website)}
+              onChangeText={(text) => updateField('website', text)}
+              placeholder="https://yourwebsite.com"
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+
+            <Input
+              label="Business Description"
+              value={String(formData.description)}
+              onChangeText={(text) => updateField('description', text)}
+              placeholder="Describe your business, services, and Christian mission (10-500 characters)"
+              multiline
+              numberOfLines={4}
+              error={errors.description}
+              required
+              style={styles.textArea}
+            />
+
+            <View style={styles.faithSection}>
+              <Text style={styles.sectionTitle}>Faith Information</Text>
+              
+              <View style={styles.checkboxContainer}>
+                <Button
+                  title={formData.faithAffirmation ? "✓ I acknowledge Jesus Christ as my Lord and Saviour" : "☐ I acknowledge Jesus Christ as my Lord and Saviour"}
+                  onPress={() => updateField('faithAffirmation', !formData.faithAffirmation)}
+                  variant={formData.faithAffirmation ? 'primary' : 'outline'}
+                  style={[styles.checkboxButton, errors.faithAffirmation && styles.errorButton]}
+                />
+                {errors.faithAffirmation && (
+                <Text style={styles.errorText}>{errors.faithAffirmation}</Text>
+                )}
+              </View>
+
+              <Input
+                label="Church Name"
+                value={String(formData.churchName)}
+                onChangeText={(text) => updateField('churchName', text)}
+                placeholder="Your Church Name"
+                error={errors.churchName}
+                required
+              />
+
+              <Input
+                label="How long have you been a Christian?"
+                type="select"
+                options={durationOptions}
+                value={String(formData.christianDuration)}
+                onValueChange={(value) => updateField('christianDuration', value)}
+              />
+
+              <Input
+                label="Church Involvement"
+                value={String(formData.churchInvolvement)}
+                onChangeText={(text) => updateField('churchInvolvement', text)}
+                placeholder="e.g., Member, Leader, Volunteer"
+              />
+            </View>
+
+            <Button
+              title="Submit for Approval"
+              onPress={handleSubmit}
+              loading={isSubmitting}
+              style={styles.submitButton}
+            />
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: Typography.lg,
+    fontWeight: 'bold',
+    color: Colors.gray900,
+  },
+  placeholder: {
+    width: 40,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: Spacing.lg,
+  },
+  subtitle: {
+    fontSize: Typography.sm,
+    color: Colors.gray700,
+    textAlign: 'center',
+    marginBottom: Spacing.xl,
+  },
+  formContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    shadowColor: Colors.gray900,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  imageSection: {
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  imageLabel: {
+    fontSize: Typography.sm,
+    fontWeight: '600',
+    color: Colors.gray700,
+    marginBottom: Spacing.sm,
+  },
+  imageUpload: {
+    width: 120,
+    height: 120,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 2,
+    borderColor: Colors.gray300,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.gray50,
+  },
+  uploadedImage: {
+    width: 116,
+    height: 116,
+    borderRadius: BorderRadius.lg,
+  },
+  imagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imagePlaceholderText: {
+    fontSize: Typography.sm,
+    color: Colors.gray400,
+    marginTop: Spacing.xs,
+  },
+  phoneContainer: {
+    marginBottom: Spacing.md,
+  },
+  phoneLabel: {
+    fontSize: Typography.sm,
+    fontWeight: '600',
+    color: Colors.gray700,
+    marginBottom: Spacing.xs,
+  },
+  required: {
+    color: Colors.error,
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  countryCode: {
+    borderWidth: 1,
+    borderColor: Colors.gray300,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    backgroundColor: Colors.gray50,
+    marginRight: Spacing.sm,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  countryCodeText: {
+    fontSize: Typography.base,
+    color: Colors.gray700,
+    fontWeight: '600',
+  },
+  phoneInput: {
+    flex: 1,
+    marginBottom: 0,
+  },
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  faithSection: {
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: Colors.gray200,
+  },
+  sectionTitle: {
+    fontSize: Typography.lg,
+    fontWeight: 'bold',
+    color: Colors.gray900,
+    marginBottom: Spacing.md,
+  },
+  checkboxContainer: {
+    marginBottom: Spacing.md,
+  },
+  checkboxButton: {
+    alignItems: 'flex-start',
+  },
+  errorButton: {
+    borderColor: Colors.error,
+  },
+  errorText: {
+    fontSize: Typography.xs,
+    color: Colors.error,
+    marginTop: Spacing.xs,
+  },
+  submitButton: {
+    marginTop: Spacing.xl,
+  },
+});
