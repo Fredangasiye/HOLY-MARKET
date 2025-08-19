@@ -77,31 +77,31 @@ export default function AccountSettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView>
+      <View>
         <TouchableOpacity
-          style={styles.backButton}
+         
           onPress={() => router.back()}
         >
           <ArrowLeft size={24} color={Colors.gray900} />
         </TouchableOpacity>
-        <Text style={styles.title}>Account Settings</Text>
-        <View style={styles.placeholder} />
+        <Text>Account Settings</Text>
+        <View />
       </View>
 
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+       
       >
         <ScrollView 
-          style={styles.content}
+         
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Personal Information</Text>
+          <View>
+            <Text>Personal Information</Text>
             
-            <View style={styles.row}>
+            <View>
               <Input
                 label="First Name"
                 value={formData.firstName}
@@ -133,13 +133,13 @@ export default function AccountSettingsScreen() {
               required
             />
 
-            <View style={styles.phoneContainer}>
-              <Text style={styles.phoneLabel}>
-                Phone Number <Text style={styles.required}>*</Text>
+            <View>
+              <Text>
+                Phone Number <Text>*</Text>
               </Text>
-              <View style={styles.phoneInputContainer}>
-                <View style={styles.countryCode}>
-                  <Text style={styles.countryCodeText}>+27</Text>
+              <View>
+                <View>
+                  <Text>+27</Text>
                 </View>
                 <Input
                   value={formData.phone}
@@ -154,8 +154,8 @@ export default function AccountSettingsScreen() {
           </View>
 
           {company && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Business Information</Text>
+            <View>
+              <Text>Business Information</Text>
               
               <Input
                 label="Business Name"
@@ -175,21 +175,21 @@ export default function AccountSettingsScreen() {
             </View>
           )}
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account Actions</Text>
+          <View>
+            <Text>Account Actions</Text>
             
             <Button
               title="Change Password"
               onPress={() => Alert.alert('Coming Soon', 'Password change functionality will be available soon.')}
               variant="outline"
-              style={styles.actionButton}
+             
             />
 
             <Button
               title="Delete Account"
               onPress={() => Alert.alert('Delete Account', 'This feature will be available soon.')}
               variant="outline"
-              style={[styles.actionButton, styles.deleteButton]}
+             
             />
           </View>
 
@@ -197,7 +197,7 @@ export default function AccountSettingsScreen() {
             title="Save Changes"
             onPress={handleSave}
             loading={isLoading}
-            style={styles.saveButton}
+           
           />
         </ScrollView>
       </KeyboardAvoidingView>

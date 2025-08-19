@@ -194,33 +194,33 @@ export default function SetupCompanyScreen() {
   }));
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.background}>
-        <View style={styles.header}>
+    <SafeAreaView>
+      <View>
+        <View>
           <TouchableOpacity
-            style={styles.backButton}
+           
             onPress={() => router.back()}
           >
             <ArrowLeft size={24} color={Colors.gray900} />
           </TouchableOpacity>
-          <Text style={styles.title}>Setup Company Profile</Text>
-          <View style={styles.placeholder} />
+          <Text>Setup Company Profile</Text>
+          <View />
         </View>
         
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.subtitle}>Complete your business information for approval</Text>
+          <Text>Complete your business information for approval</Text>
 
-          <View style={styles.formContainer}>
+          <View>
             {/* Business Image Upload */}
-            <View style={styles.imageSection}>
-              <Text style={styles.imageLabel}>Business Photo</Text>
-              <TouchableOpacity style={styles.imageUpload} onPress={showImagePicker}>
+            <View>
+              <Text>Business Photo</Text>
+              <TouchableOpacity onPress={showImagePicker}>
                 {formData.profileImage ? (
-                  <Image source={{ uri: formData.profileImage }} style={styles.uploadedImage} />
+                  <Image source={{ uri: formData.profileImage }} />
                 ) : (
-                  <View style={styles.imagePlaceholder}>
+                  <View>
                     <Upload size={32} color={Colors.gray400} />
-                    <Text style={styles.imagePlaceholderText}>Add Photo</Text>
+                    <Text>Add Photo</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -255,13 +255,13 @@ export default function SetupCompanyScreen() {
               required
             />
 
-            <View style={styles.phoneContainer}>
-              <Text style={styles.phoneLabel}>
-                Phone Number <Text style={styles.required}>*</Text>
+            <View>
+              <Text>
+                Phone Number <Text>*</Text>
               </Text>
-              <View style={styles.phoneInputContainer}>
-                <View style={styles.countryCode}>
-                  <Text style={styles.countryCodeText}>+27</Text>
+              <View>
+                <View>
+                  <Text>+27</Text>
                 </View>
                 <Input
                   value={String(formData.phone)}
@@ -274,11 +274,11 @@ export default function SetupCompanyScreen() {
               </View>
             </View>
 
-            <View style={styles.phoneContainer}>
-              <Text style={styles.phoneLabel}>WhatsApp Number</Text>
-              <View style={styles.phoneInputContainer}>
-                <View style={styles.countryCode}>
-                  <Text style={styles.countryCodeText}>+27</Text>
+            <View>
+              <Text>WhatsApp Number</Text>
+              <View>
+                <View>
+                  <Text>+27</Text>
                 </View>
                 <Input
                   value={String(formData.whatsappNumber)}
@@ -327,21 +327,21 @@ export default function SetupCompanyScreen() {
               numberOfLines={4}
               error={errors.description}
               required
-              style={styles.textArea}
+             
             />
 
-            <View style={styles.faithSection}>
-              <Text style={styles.sectionTitle}>Faith Information</Text>
+            <View>
+              <Text>Faith Information</Text>
               
-              <View style={styles.checkboxContainer}>
+              <View>
                 <Button
                   title={formData.faithAffirmation ? "✓ I acknowledge Jesus Christ as my Lord and Saviour" : "☐ I acknowledge Jesus Christ as my Lord and Saviour"}
                   onPress={() => updateField('faithAffirmation', !formData.faithAffirmation)}
                   variant={formData.faithAffirmation ? 'primary' : 'outline'}
-                  style={[styles.checkboxButton, errors.faithAffirmation && styles.errorButton]}
+                 
                 />
                 {errors.faithAffirmation && (
-                <Text style={styles.errorText}>{errors.faithAffirmation}</Text>
+                <Text>{errors.faithAffirmation}</Text>
                 )}
               </View>
 
@@ -374,7 +374,7 @@ export default function SetupCompanyScreen() {
               title="Submit for Approval"
               onPress={handleSubmit}
               loading={isSubmitting}
-              style={styles.submitButton}
+             
             />
           </View>
         </ScrollView>
