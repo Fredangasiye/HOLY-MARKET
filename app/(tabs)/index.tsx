@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Plus, Search, X } from 'lucide-react-native';
+import { Plus, Search, X, Moon, Sun } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { CompanyCard } from '@/components/CompanyCard';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { useCompanies } from '@/hooks/useAuth';
+import { useCompanies, useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useToast } from '@/contexts/ToastContext';
 import { Company } from '@/types';
-import { Colors, Spacing, Typography, BorderRadius } from '@/constants/Colors';
 
 export default function HomeScreen() {
   const { companies, isLoading } = useCompanies();
+  const { authState } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+
+  // DEBUG: This should show a bright red text if code is updating
+  console.log('HomeScreen rendered with theme:', theme.isDark ? 'dark' : 'light');
 
   // Fuzzy matching function
   const fuzzyMatch = (text: string, query: string): boolean => {
@@ -55,13 +64,24 @@ export default function HomeScreen() {
   }, [searchQuery, companies]);
 
   const handleAddBusiness = () => {
+    if (!authState.isAuthenticated) {
+      showToast('Sign in required to add business');
+      setTimeout(() => {
+        router.push({ 
+          pathname: '/(auth)/login', 
+          params: { redirect: 'setup-company' } 
+        });
+      }, 1000);
+      return;
+    }
+
     router.push('/(auth)/setup-company');
   };
 
   const handleCompanyPress = (companyId: string) => {
     router.push({
       pathname: '/(tabs)/company-profile',
-      params: { id: companyId }
+      params: { id: companyId },
     });
   };
 
@@ -69,181 +89,209 @@ export default function HomeScreen() {
     setSearchQuery('');
   };
 
-  return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.welcomeText}>Welcome to</Text>
-          <Text style={styles.appTitle}>Christian Business Network</Text>
-          <Text style={styles.subtitle}>Connecting Faith-Based Businesses in South Africa</Text>
-        </View>
+  const handleThemeToggle = () => {
+    toggleTheme();
+    Haptics.selectionAsync();
+    showToast('Theme toggled!');
+  };
 
-        {/* Search Section */}
-        <View style={styles.searchSection}>
+  const handleFABPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    showToast('FAB Clicked 🚀');
+    handleAddBusiness();
+  };
+
+  return (
+    <LinearGradient
+      colors={
+        theme.isDark
+          ? ["#0D0D0D", "#1A202C"]
+          : ["#2B6CB0", "#63B3ED"]
+      }
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>HOLY-MARKET</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.text, opacity: 0.8 }]}>Christian Business Community</Text>
+            
+            {/* DEBUG: This should be very visible if code is updating */}
+            <Text style={{ color: 'red', fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10 }}>
+              🔥 DEBUG: CODE IS UPDATING! 🔥
+            </Text>
+            
+            {/* Theme Toggle */}
+            <TouchableOpacity
+              style={[styles.themeToggle, { backgroundColor: theme.colors.secondary }]}
+              onPress={handleThemeToggle}
+            >
+              {theme.isDark ? <Sun size={24} color={theme.colors.text} /> : <Moon size={24} color={theme.colors.text} />}
+            </TouchableOpacity>
+          </View>
+
+          {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <View style={styles.searchInputContainer}>
-              <Search size={20} color={Colors.gray400} style={styles.searchIcon} />
+            <View style={[styles.searchBar, { backgroundColor: theme.colors.card }]}>
+              <Search size={20} color={theme.colors.text} style={styles.searchIcon} />
               <TextInput
-                style={styles.searchInput}
-                placeholder="Search businesses, categories, or locations..."
-                placeholderTextColor={Colors.gray400}
+                style={[styles.searchInput, { color: theme.colors.text }]}
+                placeholder="Search businesses, categories, locations..."
+                placeholderTextColor={theme.colors.text + '80'}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
+                returnKeyType="search"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-                  <X size={20} color={Colors.gray400} />
+                  <X size={20} color={theme.colors.text} />
                 </TouchableOpacity>
               )}
             </View>
           </View>
-        </View>
 
-        {/* Featured Companies */}
-        <View style={styles.featuredSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              {searchQuery ? `Search Results (${filteredCompanies.length})` : 'Featured Businesses'}
-            </Text>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddBusiness}>
-              <Plus size={24} color={Colors.white} />
-            </TouchableOpacity>
-          </View>
-          
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <LoadingSpinner color={Colors.white} />
+          {/* Featured Businesses Section */}
+          <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                {searchQuery ? `Search Results (${filteredCompanies.length})` : 'Featured Businesses'}
+              </Text>
             </View>
-          ) : filteredCompanies.length > 0 ? (
-            <View style={styles.companiesGrid}>
-              {filteredCompanies.map(company => (
-                <View key={company.id} style={styles.companyCardWrapper}>
-                  <CompanyCard 
-                    company={company} 
+            
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <LoadingSpinner />
+              </View>
+            ) : filteredCompanies.length > 0 ? (
+              <View style={styles.companiesGrid}>
+                {filteredCompanies.map((company) => (
+                  <CompanyCard
+                    key={company.id}
+                    company={company}
                     onPress={() => handleCompanyPress(company.id)}
                   />
-                </View>
-              ))}
-            </View>
-          ) : searchQuery ? (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsTitle}>No businesses found</Text>
-              <Text style={styles.noResultsText}>
-                Try adjusting your search terms or browse all businesses
-              </Text>
-              <TouchableOpacity onPress={clearSearch} style={styles.clearSearchButton}>
-                <Text style={styles.clearSearchText}>Clear Search</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsTitle}>No businesses available</Text>
-              <Text style={styles.noResultsText}>
-                Be the first to add your business to our community
-              </Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
-    </View>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.noResultsContainer}>
+                <Text style={[styles.noResultsTitle, { color: theme.colors.text }]}>No businesses available</Text>
+                <Text style={[styles.noResultsText, { color: theme.colors.text, opacity: 0.7 }]}>
+                  Be the first to add your business to our community
+                </Text>
+                <TouchableOpacity style={[styles.addFirstButton, { backgroundColor: theme.colors.primary }]} onPress={handleAddBusiness}>
+                  <Plus size={20} color="white" />
+                  <Text style={styles.addFirstButtonText}>Add Your Business</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* FAB */}
+        <TouchableOpacity
+          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+          onPress={handleFABPress}
+        >
+          <Plus size={24} color="white" />
+        </TouchableOpacity>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.secondary,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 100,
   },
   header: {
-    backgroundColor: Colors.secondary,
-    padding: Spacing.lg,
-    paddingTop: Spacing.xl,
-    borderBottomLeftRadius: BorderRadius.xl,
-    borderBottomRightRadius: BorderRadius.xl,
+    padding: 20,
+    paddingTop: 40,
+    alignItems: 'center',
+    position: 'relative',
   },
-  welcomeText: {
-    fontSize: Typography.base,
-    color: Colors.white,
-    opacity: 0.9,
-    textAlign: 'center',
-  },
-  appTitle: {
-    fontSize: Typography['3xl'],
+  title: {
+    fontSize: 36,
     fontWeight: 'bold',
-    color: Colors.white,
     textAlign: 'center',
-    marginBottom: Spacing.xs,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: Typography.sm,
-    color: Colors.white,
-    opacity: 0.9,
+    fontSize: 18,
     textAlign: 'center',
-    marginBottom: Spacing.xl,
   },
-  searchSection: {
-    backgroundColor: Colors.secondary,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-  },
-  searchContainer: {
-    backgroundColor: Colors.white,
-    borderRadius: BorderRadius.lg,
-    shadowColor: Colors.gray900,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-  },
-  searchIcon: {
-    marginRight: Spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: Typography.base,
-    color: Colors.gray900,
-    paddingVertical: Spacing.sm,
-  },
-  clearButton: {
-    padding: Spacing.xs,
-    marginLeft: Spacing.sm,
-  },
-  featuredSection: {
-    padding: Spacing.lg,
-    backgroundColor: Colors.secondary,
-    flex: 1,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: Typography['2xl'],
-    fontWeight: 'bold',
-    color: Colors.white,
-    flex: 1,
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: BorderRadius.full,
-    backgroundColor: '#32CD32',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: Colors.gray900,
-    shadowOffset: { width: 0, height: 2 },
+  themeToggle: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    padding: 12,
+    borderRadius: 25,
+    shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 8,
+  },
+  clearButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  section: {
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 20,
+    paddingTop: 30,
+    flex: 1,
+    minHeight: '70%',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -256,42 +304,51 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  companyCardWrapper: {
-    width: '48%',
-    marginBottom: Spacing.md,
-  },
   noResultsContainer: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.xxl,
+    paddingVertical: 40,
   },
   noResultsTitle: {
-    fontSize: Typography.lg,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.white,
-    marginBottom: Spacing.sm,
+    marginBottom: 12,
     textAlign: 'center',
   },
   noResultsText: {
-    fontSize: Typography.base,
-    color: Colors.white,
-    opacity: 0.8,
+    fontSize: 16,
     textAlign: 'center',
-    marginBottom: Spacing.lg,
-    lineHeight: 24,
+    marginBottom: 30,
+    maxWidth: 280,
   },
-  clearSearchButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+  addFirstButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  clearSearchText: {
-    color: Colors.white,
-    fontSize: Typography.base,
+  addFirstButtonText: {
+    fontSize: 16,
     fontWeight: '600',
+    color: 'white',
+    marginLeft: 8,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
 });

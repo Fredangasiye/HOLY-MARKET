@@ -132,8 +132,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         firstName: userData.firstName || '',
         lastName: userData.lastName || '',
         email: userData.email || '',
-        phone: userData.phone || '',
-        businessName: userData.businessName || '',
+        phone: userData.phone || ''
+        businessName: userData.businessName || 'New Business',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        businessName: userData.businessName || 'New Business',
         createdAt: new Date(),
         updatedAt: new Date(),
       };

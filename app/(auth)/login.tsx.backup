@@ -1,28 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/Colors';
 
 export default function LoginScreen() {
-  const { login, authState } = useAuth();
-  const { redirect } = useLocalSearchParams();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const { login, authState } = useAuth();
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -46,20 +35,11 @@ export default function LoginScreen() {
 
     const success = await login(email, password);
     if (success) {
-      // Check if we should redirect to setup-company
-      if (redirect === 'setup-company') {
-        router.replace('/(auth)/setup-company');
-      } else {
-        router.replace('/(tabs)');
-      }
+      router.replace('/(tabs)');
     } else {
       Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
     }
   };
-
-  if (authState.isLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -74,27 +54,26 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.logoContainer}>
-              <Text style={styles.logo}>HOLY-MARKET</Text>
-              <Text style={styles.tagline}>Christian Business Community</Text>
+              <View style={styles.logoPlaceholder}>
+                <Text style={styles.logoText}>CBN</Text>
+              </View>
+              <Text style={styles.appName}>Christian Business Network</Text>
+              <Text style={styles.tagline}>Connecting Faith-Based Businesses</Text>
             </View>
 
             <View style={styles.formContainer}>
               <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>
-                {redirect === 'setup-company' 
-                  ? 'Please sign in to add your business to our community'
-                  : 'Sign in to your account'
-                }
-              </Text>
+              <Text style={styles.subtitle}>Sign in to connect with Christian businesses</Text>
 
               <Input
-                label="Email"
+                label="Email Address"
                 value={email}
                 onChangeText={setEmail}
-                placeholder="your@email.com"
+                placeholder="Enter your email"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 error={errors.email}
+                required
               />
 
               <Input
@@ -104,6 +83,7 @@ export default function LoginScreen() {
                 placeholder="Enter your password"
                 secureTextEntry
                 error={errors.password}
+                required
               />
 
               <Button
@@ -116,13 +96,7 @@ export default function LoginScreen() {
               <View style={styles.footer}>
                 <Text style={styles.footerText}>
                   Don't have an account?{' '}
-                  <Link 
-                    href={{
-                      pathname: "/(auth)/register",
-                      params: redirect === 'setup-company' ? { redirect: 'setup-company' } : {}
-                    }} 
-                    style={styles.link}
-                  >
+                  <Link href="/(auth)/register" style={styles.link}>
                     Sign Up
                   </Link>
                 </Text>
@@ -150,27 +124,47 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: Spacing.lg,
+    minHeight: '100%',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.xxl,
   },
-  logo: {
-    fontSize: Typography['5xl'],
+  logoPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+    shadowColor: Colors.gray900,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  logoText: {
+    fontSize: Typography['2xl'],
     fontWeight: 'bold',
     color: Colors.white,
+  },
+  appName: {
+    fontSize: Typography.lg,
+    fontWeight: 'bold',
+    color: Colors.gray900,
     textAlign: 'center',
     marginBottom: Spacing.xs,
   },
   tagline: {
-    fontSize: Typography.lg,
-    color: Colors.gray200,
+    fontSize: Typography.sm,
+    color: Colors.gray700,
     textAlign: 'center',
   },
   formContainer: {
     backgroundColor: Colors.white,
     borderRadius: BorderRadius.xl,
-    padding: Spacing.xl,
+    padding: Spacing.lg,
     shadowColor: Colors.gray900,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -182,26 +176,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.gray900,
     textAlign: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: Typography.base,
+    fontSize: Typography.sm,
     color: Colors.gray600,
     textAlign: 'center',
     marginBottom: Spacing.xl,
   },
   loginButton: {
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.lg,
+    marginTop: Spacing.md,
   },
   footer: {
-    alignItems: 'center',
     marginTop: Spacing.lg,
+    alignItems: 'center',
   },
   footerText: {
     fontSize: Typography.sm,
     color: Colors.gray600,
-    textAlign: 'center',
   },
   link: {
     color: Colors.secondary,

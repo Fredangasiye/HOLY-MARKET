@@ -10,9 +10,6 @@ export default function Index() {
     return <LoadingSpinner />;
   }
 
-  if (authState.isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
-  }
-
-  return <Redirect href="/(auth)/login" />;
+  // Always redirect to main app - authentication will be handled per feature
+  return <Redirect href="/(tabs)" />;
 }

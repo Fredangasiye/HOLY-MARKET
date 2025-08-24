@@ -46,28 +46,6 @@ export default function SetupCompanyScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check authentication on component mount
-  useEffect(() => {
-    if (!authState.isLoading && !authState.isAuthenticated) {
-      Alert.alert(
-        'Authentication Required',
-        'You need to sign in to add your business to our community.',
-        [
-          {
-            text: 'Sign In',
-            onPress: () => router.replace('/(auth)/login'),
-          },
-        ],
-        { cancelable: false }
-      );
-    }
-  }, [authState.isLoading, authState.isAuthenticated]);
-
-  // Don't render if not authenticated
-  if (!authState.isLoading && !authState.isAuthenticated) {
-    return null; // Component will redirect via useEffect
-  }
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
