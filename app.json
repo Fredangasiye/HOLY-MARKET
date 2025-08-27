@@ -17,11 +17,18 @@
       "favicon": "./assets/images/favicon.png",
       "build": {
         "babel": {
-          "include": ["**/*"]
+          "include": [
+            "**/*"
+          ]
         }
       }
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      "expo-secure-store"
+    ],
     "experiments": {
       "typedRoutes": true
     }

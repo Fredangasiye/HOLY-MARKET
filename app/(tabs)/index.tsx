@@ -121,10 +121,27 @@ export default function HomeScreen() {
             <Text style={[styles.title, { color: theme.colors.text }]}>HOLY-MARKET</Text>
             <Text style={[styles.subtitle, { color: theme.colors.text, opacity: 0.8 }]}>Christian Business Community</Text>
             
-            {/* DEBUG: This should be very visible if code is updating */}
-            <Text style={{ color: 'red', fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10 }}>
-              🔥 DEBUG: CODE IS UPDATING! 🔥
+                      {/* DEBUG: This should be very visible if code is updating */}
+          <Text style={{ color: 'red', fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10 }}>
+            🔥 DEBUG: CODE IS UPDATING! 🔥
+          </Text>
+          
+          {/* Modern UI Test */}
+          <View style={{ 
+            backgroundColor: '#10B981', 
+            padding: 16, 
+            borderRadius: 12, 
+            marginTop: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8
+          }}>
+            <Text style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 16 }}>
+              🎨 Modern UI is working!
             </Text>
+          </View>
             
             {/* Theme Toggle */}
             <TouchableOpacity

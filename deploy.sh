@@ -17,12 +17,21 @@ if [ -d "dist" ]; then
     echo "📁 Build contents:"
     ls -la dist/
     
+    # Add all changes to git
+    echo "📝 Adding changes to git..."
+    git add .
+    
+    # Create a new commit
+    echo "💾 Creating new commit..."
+    git commit -m "Deploy: Update HOLY-MARKET app state - $(date)"
+    
+    # Push to GitHub
+    echo "🚀 Pushing to GitHub..."
+    git push
+    
     echo ""
-    echo "🌐 To deploy to Vercel:"
-    echo "1. Commit your changes: git add . && git commit -m 'Update UI'"
-    echo "2. Push to GitHub: git push"
-    echo "3. Vercel will automatically deploy from the dist/ folder"
-    echo ""
+    echo "✅ Deployment initiated!"
+    echo "🌐 Vercel will automatically deploy from the latest commit"
     echo "🔍 To test locally: npx expo start --web"
 else
     echo "❌ Build failed!"
