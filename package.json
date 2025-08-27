@@ -4,17 +4,19 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start",
-    "start": "expo start",
-    "build": "expo export --platform web",
-    "build:web": "expo export --platform web",
-    "export:web": "expo export --platform web",
-    "lint": "expo lint"
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build",
+    "lint": "next lint"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@expo/vector-icons": "^14.1.0",
     "@expo/webpack-config": "^19.0.1",
+    "next": "^14.0.0",
+    "framer-motion": "^10.16.0",
+    "next-themes": "^0.2.1",
+    "react-hot-toast": "^2.4.1",
     "@lucide/lab": "^0.1.2",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-picker/picker": "^2.9.0",
