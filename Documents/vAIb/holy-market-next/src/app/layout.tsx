@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,8 +26,37 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "HOLY-MARKET - Christian Business Community",
-  description: "A Christian Business Network for Kingdom Entrepreneurs",
+  title: {
+    default: "HOLY-MARKET — Christian Business Community",
+    template: "%s | HOLY-MARKET",
+  },
+  description: "A Christian Business Network for Kingdom Entrepreneurs.",
+  metadataBase: new URL("https://holy-market-next.vercel.app"),
+  applicationName: "HOLY-MARKET",
+  authors: [{ name: "HOLY-MARKET" }],
+  openGraph: {
+    type: "website",
+    title: "HOLY-MARKET — Christian Business Community",
+    description: "Network, discover, and grow Kingdom-aligned businesses.",
+    url: "/",
+    siteName: "HOLY-MARKET",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HOLY-MARKET — Christian Business Community",
+    description: "Network, discover, and grow Kingdom-aligned businesses.",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({
@@ -35,8 +67,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${poppins.variable} font-sans antialiased`}>
-        {children}
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-2 rounded">Skip to content</a>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <main id="main">
+            {children}
+          </main>
+        </ThemeProvider>
         <Toaster position="bottom-center" />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

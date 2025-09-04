@@ -5,23 +5,16 @@ import { Plus, Sun, Moon, Search, Users, Building2, Heart, Church, User, Info, B
 import toast from "react-hot-toast";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
-  // Redirect to dashboard after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/dashboard");
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [router]);
-
   const handleFABClick = () => {
-    toast.success("FAB Clicked 🚀");
+    router.push("/add-business");
+    toast.success("Adding new business...");
     // Add haptic feedback for mobile
     if (navigator.vibrate) {
       navigator.vibrate(50);
@@ -107,11 +100,11 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <Link href="/dashboard" className="px-8 py-4 bg-faith-gold text-faith-blue font-bold rounded-full hover:scale-105 transition-transform shadow-lg">
-              Enter Dashboard
+            <Link href="/add-business" className="px-8 py-4 bg-faith-gold text-faith-blue font-bold rounded-full hover:scale-105 transition-transform shadow-lg">
+              Add a Business
             </Link>
-            <Link href="/auth/login" className="px-8 py-4 bg-white/20 text-white font-bold rounded-full hover:scale-105 transition-transform backdrop-blur-sm">
-              Login
+            <Link href="/christian-businesses" className="px-8 py-4 bg-white/20 text-white font-bold rounded-full hover:scale-105 transition-transform backdrop-blur-sm">
+              Browse Christian Businesses
             </Link>
             <Link href="/christian-catalogue" className="px-8 py-4 bg-emerald-500 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-lg flex items-center gap-2">
               <BookOpen size={20} />
@@ -124,69 +117,120 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="py-16 bg-white/10 dark:bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-3xl font-display font-bold text-white text-center mb-12"
+          >
+            Explore Our Platform
+          </motion.h2>
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
-            <div className="text-center p-6 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm">
-              <Building2 className="w-12 h-12 text-faith-gold mx-auto mb-4" />
-              <h3 className="text-xl font-display font-bold text-white mb-2">Christian Businesses</h3>
-              <p className="text-white/80">Connect with faith-based entrepreneurs</p>
-            </div>
+            <Link href="/christian-businesses" className="group">
+              <motion.div 
+                className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Building2 className="w-16 h-16 text-faith-gold mx-auto mb-6 group-hover:text-faith-gold/80 transition-colors" />
+                <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-faith-gold transition-colors">Christian Businesses</h3>
+                <p className="text-white/80 mb-4">Connect with faith-based entrepreneurs and discover businesses that align with your values</p>
+                <div className="text-faith-gold text-sm font-medium group-hover:text-faith-gold/80 transition-colors">
+                  Explore Businesses →
+                </div>
+              </motion.div>
+            </Link>
             
-            <div className="text-center p-6 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm">
-              <Users className="w-12 h-12 text-faith-gold mx-auto mb-4" />
-              <h3 className="text-xl font-display font-bold text-white mb-2">Community</h3>
-              <p className="text-white/80">Build meaningful relationships</p>
-            </div>
+            <Link href="/community" className="group">
+              <motion.div 
+                className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Users className="w-16 h-16 text-faith-gold mx-auto mb-6 group-hover:text-faith-gold/80 transition-colors" />
+                <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-faith-gold transition-colors">Community</h3>
+                <p className="text-white/80 mb-4">Build meaningful relationships with like-minded Christian entrepreneurs</p>
+                <div className="text-faith-gold text-sm font-medium group-hover:text-faith-gold/80 transition-colors">
+                  Join Community →
+                </div>
+              </motion.div>
+            </Link>
             
-            <div className="text-center p-6 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm">
-              <Heart className="w-12 h-12 text-faith-gold mx-auto mb-4" />
-              <h3 className="text-xl font-display font-bold text-white mb-2">Kingdom Values</h3>
-              <p className="text-white/80">Business with purpose and integrity</p>
-            </div>
+            <Link href="/kingdom-values" className="group">
+              <motion.div 
+                className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Heart className="w-16 h-16 text-faith-gold mx-auto mb-6 group-hover:text-faith-gold/80 transition-colors" />
+                <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-faith-gold transition-colors">Kingdom Values</h3>
+                <p className="text-white/80 mb-4">Learn about conducting business with purpose, integrity, and Christian principles</p>
+                <div className="text-faith-gold text-sm font-medium group-hover:text-faith-gold/80 transition-colors">
+                  Discover Values →
+                </div>
+              </motion.div>
+            </Link>
             
-            <Link href="/christian-catalogue" className="text-center p-6 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer">
-              <BookOpen className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-              <h3 className="text-xl font-display font-bold text-white mb-2">Christian Catalogue</h3>
-              <p className="text-white/80">Directory of Christian resources</p>
+            <Link href="/christian-catalogue" className="group">
+              <motion.div 
+                className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-emerald-400/50 transition-all duration-300 cursor-pointer h-full"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <BookOpen className="w-16 h-16 text-emerald-400 mx-auto mb-6 group-hover:text-emerald-400/80 transition-colors" />
+                <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Christian Catalogue</h3>
+                <p className="text-white/80 mb-4">Access a comprehensive directory of Christian resources, books, and materials</p>
+                <div className="text-emerald-400 text-sm font-medium group-hover:text-emerald-400/80 transition-colors">
+                  Browse Catalogue →
+                </div>
+              </motion.div>
             </Link>
           </motion.div>
         </div>
       </section>
 
       {/* Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800">
-        <div className="flex justify-around py-3">
-          <Link
-            href="/dashboard"
-            className="flex flex-col items-center py-2 px-4 text-faith-blue dark:text-faith-gold"
-          >
-            <Church size={24} />
-            <span className="text-xs mt-1">Dashboard</span>
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10">
+        <div className="flex justify-around items-center py-3">
+          <Link href="/" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Church size={20} className="text-blue-400" />
+            </div>
+            <span className="text-xs text-blue-400 font-medium">Home</span>
           </Link>
-          <Link
-            href="/christian-catalogue"
-            className="flex flex-col items-center py-2 px-4 text-emerald-500 hover:text-emerald-600"
-          >
-            <BookOpen size={24} />
-            <span className="text-xs mt-1">Catalogue</span>
+          
+          <Link href="/dashboard" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Building2 size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">Dashboard</span>
           </Link>
-          <Link
-            href="/about"
-            className="flex flex-col items-center py-2 px-4 text-gray-500 hover:text-faith-blue dark:text-gray-400 dark:hover:text-faith-gold"
-          >
-            <Info size={24} />
-            <span className="text-xs mt-1">About</span>
+          
+          <Link href="/about" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Info size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">About</span>
           </Link>
-          <Link
-            href="/auth/login"
-            className="flex flex-col items-center py-2 px-4 text-gray-500 hover:text-faith-blue dark:text-gray-400 dark:hover:text-faith-gold"
-          >
-            <User size={24} />
-            <span className="text-xs mt-1">Login</span>
+          
+          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <User size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
+          </Link>
+          
+          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <BookOpen size={20} className="text-green-400" />
+            </div>
+            <span className="text-xs text-green-400 font-medium">Catalogue</span>
           </Link>
         </div>
       </nav>

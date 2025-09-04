@@ -13,7 +13,10 @@ import {
   Heart,
   Building2,
   Calendar,
-  Shield
+  Shield,
+  Church,
+  Info,
+  BookOpen
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
@@ -296,32 +299,42 @@ export default function ProfilePage() {
         </motion.section>
       </main>
 
-      {/* Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex justify-around py-2">
-          <Link
-            href="/dashboard"
-            className="flex flex-col items-center py-2 px-4 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-          >
-            <span className="text-xs">Home</span>
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10">
+        <div className="flex justify-around items-center py-3">
+          <Link href="/" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Church size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">Home</span>
           </Link>
-          <Link
-            href="/company"
-            className="flex flex-col items-center py-2 px-4 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-          >
-            <span className="text-xs">My Company</span>
+          
+          <Link href="/dashboard" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Building2 size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">Dashboard</span>
           </Link>
-          <Link
-            href="/about"
-            className="flex flex-col items-center py-2 px-4 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-          >
-            <span className="text-xs">About</span>
+          
+          <Link href="/about" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Info size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">About</span>
           </Link>
-          <Link
-            href="/profile"
-            className="flex flex-col items-center py-2 px-4 text-blue-600 dark:text-blue-400"
-          >
-            <span className="text-xs">Profile</span>
+          
+          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <User size={20} className="text-white" />
+            </div>
+            <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
+          </Link>
+          
+          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <BookOpen size={20} className="text-green-400" />
+            </div>
+            <span className="text-xs text-green-400 font-medium">Catalogue</span>
           </Link>
         </div>
       </nav>
