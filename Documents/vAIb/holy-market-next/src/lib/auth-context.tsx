@@ -46,6 +46,11 @@ export const useAuth = () => {
 };
 
 const saveUserToFirestore = async (user: User) => {
+  if (!db) {
+    console.warn('Firestore not configured. User data not saved.');
+    return;
+  }
+
   try {
     await setDoc(doc(db, 'users', user.id), {
       ...user,
@@ -58,6 +63,11 @@ const saveUserToFirestore = async (user: User) => {
 };
 
 const getUserFromFirestore = async (uid: string): Promise<User | null> => {
+  if (!db) {
+    console.warn('Firestore not configured. Cannot fetch user data.');
+    return null;
+  }
+
   try {
     const userDoc = await getDoc(doc(db, 'users', uid));
     if (userDoc.exists()) {
@@ -81,6 +91,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      // Firebase not configured, set loading to false
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         try {
@@ -119,6 +135,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
+    if (!auth) {
+      setError('Firebase not configured. Please contact support.');
+      return false;
+    }
+
     try {
       setError(null);
       setLoading(true);
@@ -133,6 +154,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
+    if (!auth) {
+      setError('Firebase not configured. Please contact support.');
+      return false;
+    }
+
     try {
       setError(null);
       setLoading(true);
@@ -171,6 +197,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async (): Promise<boolean> => {
+    if (!auth || !googleProvider) {
+      setError('Firebase not configured. Please contact support.');
+      return false;
+    }
+
     try {
       setError(null);
       setLoading(true);
@@ -208,6 +239,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async (): Promise<void> => {
+    if (!auth) {
+      setUser(null);
+      return;
+    }
+
     try {
       setError(null);
       await firebaseSignOut(auth);
