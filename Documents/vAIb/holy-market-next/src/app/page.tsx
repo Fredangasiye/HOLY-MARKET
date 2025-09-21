@@ -69,13 +69,13 @@ export default function HomePage() {
                 </motion.button>
               </>
             ) : (
-              <Link href="/auth/login">
+              <Link href="/add-business">
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-full bg-blue-500/20 hover:bg-blue-500/30 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 bg-faith-gold text-faith-blue font-semibold rounded-lg hover:bg-faith-gold/80 transition-colors"
                 >
-                  <LogIn className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  Add Your Business
                 </motion.button>
               </Link>
             )}

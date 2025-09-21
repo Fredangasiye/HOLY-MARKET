@@ -29,10 +29,9 @@ import {
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@/lib/auth-context";
-import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function AddBusinessPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -326,9 +325,135 @@ export default function AddBusinessPage() {
     }
   };
 
-  return (
-    <ProtectedRoute>
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!user) {
+    return (
       <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <ArrowLeft className="w-6 h-6 text-faith-blue dark:text-white" />
+              </Link>
+              <div className="flex items-center space-x-2">
+                <Building2 className="w-8 h-8 text-faith-gold" />
+                <h1 className="text-2xl font-display font-bold text-faith-blue dark:text-white">
+                  Add Your Business
+                </h1>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Login Prompt */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-12 border border-white/20"
+              >
+                <div className="mb-8">
+                  <div className="w-24 h-24 mx-auto mb-6 bg-faith-gold/20 rounded-full flex items-center justify-center">
+                    <Building2 className="w-12 h-12 text-faith-gold" />
+                  </div>
+                  <h2 className="text-3xl font-display font-bold text-white mb-4">
+                    Join Our Christian Business Community
+                  </h2>
+                  <p className="text-white/80 text-lg leading-relaxed">
+                    To add your business to our directory, please sign in or create an account. 
+                    This helps us maintain a trusted community of Christian entrepreneurs.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <Link href="/auth/login">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full bg-faith-gold text-faith-blue font-semibold py-4 px-8 rounded-lg hover:bg-faith-gold/80 transition-colors text-lg"
+                    >
+                      Sign In
+                    </motion.button>
+                  </Link>
+                  
+                  <Link href="/auth/register">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full bg-white/10 text-white font-semibold py-4 px-8 rounded-lg hover:bg-white/20 transition-colors text-lg border border-white/20"
+                    >
+                      Create Account
+                    </motion.button>
+                  </Link>
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-white/20">
+                  <p className="text-white/60 text-sm">
+                    Already have an account? <Link href="/auth/login" className="text-faith-gold hover:text-faith-gold/80 font-semibold">Sign in here</Link>
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Bottom Navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-white/10 shadow-lg">
+          <div className="flex justify-around items-center py-3">
+            <Link href="/" className="flex flex-col items-center gap-1">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Church size={20} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-xs text-gray-900 dark:text-blue-400 font-medium">Home</span>
+            </Link>
+            
+            <Link href="/dashboard" className="flex flex-col items-center gap-1">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Building2 size={20} className="text-gray-600 dark:text-white" />
+              </div>
+              <span className="text-xs text-gray-900 dark:text-white font-medium">Dashboard</span>
+            </Link>
+            
+            <Link href="/about" className="flex flex-col items-center gap-1">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Info size={20} className="text-gray-600 dark:text-white" />
+              </div>
+              <span className="text-xs text-gray-900 dark:text-white font-medium">About</span>
+            </Link>
+            
+            <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <User size={20} className="text-gray-600 dark:text-white" />
+              </div>
+              <span className="text-xs text-gray-900 dark:text-white font-medium">Browse</span>
+            </Link>
+            
+            <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <BookOpen size={20} className="text-green-600 dark:text-green-400" />
+              </div>
+              <span className="text-xs text-gray-900 dark:text-green-400 font-medium">Catalogue</span>
+            </Link>
+          </div>
+        </nav>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -941,6 +1066,5 @@ export default function AddBusinessPage() {
           </div>
         </nav>
       </div>
-    </ProtectedRoute>
   );
 }
