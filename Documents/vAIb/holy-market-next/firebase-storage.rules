@@ -1,0 +1,44 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // User profile images - public read, owner write
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null 
+        && request.auth.uid == userId
+        && isValidImageFile(fileName)
+        && request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+    
+    // Business images - public read, authenticated write
+    match /businesses/{businessId}/images/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null 
+        && isValidImageFile(fileName)
+        && request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+    
+    // Private business documents - owner only
+    match /businesses/{businessId}/documents/{fileName} {
+      allow read, write: if request.auth != null 
+        && isBusinessOwner(businessId);
+    }
+    
+    // Temporary uploads - short-lived access
+    match /temp/{userId}/{fileName} {
+      allow read, write: if request.auth != null 
+        && request.auth.uid == userId
+        && request.time < timestamp.date(2024, 12, 31); // Expires end of year
+    }
+  }
+}
+
+// Helper functions
+function isValidImageFile(fileName) {
+  return fileName.matches('.*\\.(jpg|jpeg|png|gif|webp)$');
+}
+
+function isBusinessOwner(businessId) {
+  return exists(/databases/$(database)/documents/businesses/$(businessId)) &&
+         get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
+}
