@@ -1,16 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Plus, Sun, Moon, Search, Users, Building2, Heart, Church, User, Info, BookOpen, Settings } from "lucide-react";
+import { Plus, Sun, Moon, Search, Users, Building2, Heart, Church, User, Info, BookOpen, Settings, LogIn } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const handleFABClick = () => {
     router.push("/add-business");
@@ -43,6 +45,40 @@ export default function HomePage() {
           </motion.div>
           
           <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <Link href="/dashboard">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 rounded-full bg-green-500/20 hover:bg-green-500/30 transition-colors"
+                  >
+                    <User className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </motion.button>
+                </Link>
+                <motion.button
+                  onClick={async () => {
+                    await signOut();
+                    toast.success("Signed out successfully!");
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/30 transition-colors"
+                >
+                  <LogIn className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </motion.button>
+              </>
+            ) : (
+              <Link href="/auth/login">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-full bg-blue-500/20 hover:bg-blue-500/30 transition-colors"
+                >
+                  <LogIn className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </motion.button>
+              </Link>
+            )}
             <Link href="/settings">
               <motion.button
                 whileHover={{ scale: 1.1 }}

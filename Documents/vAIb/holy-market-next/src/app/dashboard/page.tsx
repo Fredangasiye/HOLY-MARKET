@@ -26,12 +26,15 @@ import {
   Award,
   Heart,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  LogOut
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Mock user profile data
 const userProfile = {
@@ -85,6 +88,7 @@ export default function DashboardPage() {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const handleThemeToggle = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -101,8 +105,15 @@ export default function DashboardPage() {
     toast.success("Redirecting to business form...");
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out successfully!");
+    router.push("/");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -130,6 +141,14 @@ export default function DashboardPage() {
               ) : (
                 <Moon className="w-5 h-5 text-faith-blue" />
               )}
+            </motion.button>
+            <motion.button
+              onClick={handleSignOut}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/30 transition-colors"
+            >
+              <LogOut className="w-5 h-5 text-red-400" />
             </motion.button>
           </div>
         </div>
@@ -188,15 +207,15 @@ export default function DashboardPage() {
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">{userProfile.name}</h2>
-                        <p className="text-faith-gold font-medium mb-2">{userProfile.email}</p>
+                        <h2 className="text-3xl font-display font-bold text-white mb-2">{user?.name || 'User'}</h2>
+                        <p className="text-faith-gold font-medium mb-2">{user?.email || 'user@example.com'}</p>
                         <div className="flex items-center gap-2 text-white/70 mb-2">
                           <MapPin className="w-4 h-4" />
-                          <span>{userProfile.location}</span>
+                          <span>{user?.phone || 'No phone number'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/70">
                           <Calendar className="w-4 h-4" />
-                          <span>Member since {userProfile.memberSince}</span>
+                          <span>Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
                         </div>
                       </div>
                       
@@ -209,17 +228,23 @@ export default function DashboardPage() {
                       </button>
                     </div>
                     
-                    <p className="text-white/80 text-lg leading-relaxed mb-6">{userProfile.bio}</p>
+                    <p className="text-white/80 text-lg leading-relaxed mb-6">
+                      {user?.authProvider === 'google' 
+                        ? 'Welcome to the Christian business community! Connect with like-minded entrepreneurs and grow your business with Kingdom values.'
+                        : 'Passionate Christian entrepreneur dedicated to building businesses that honor God and serve communities.'
+                      }
+                    </p>
                     
-                    {/* Interests */}
+                    {/* Auth Provider */}
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-white mb-3">Interests</h3>
+                      <h3 className="text-lg font-semibold text-white mb-3">Account Type</h3>
                       <div className="flex flex-wrap gap-2">
-                        {userProfile.interests.map((interest, index) => (
-                          <span key={index} className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
-                            {interest}
-                          </span>
-                        ))}
+                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
+                          {user?.authProvider === 'google' ? 'Google Account' : 'Email Account'}
+                        </span>
+                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
+                          Christian Business Member
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -228,19 +253,19 @@ export default function DashboardPage() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userProfile.stats.businessesOwned}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Businesses</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userProfile.stats.connections}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Connections</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userProfile.stats.reviews}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Reviews</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userProfile.stats.rating}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">5.0</div>
                     <div className="text-white/70 text-sm">Rating</div>
                   </div>
                 </div>
@@ -414,6 +439,7 @@ export default function DashboardPage() {
           </Link>
         </div>
       </nav>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
