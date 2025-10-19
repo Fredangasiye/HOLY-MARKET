@@ -104,11 +104,10 @@ export default function LoginPage() {
                     if (error) clearError();
                   }}
                   placeholder="your@email.com"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.email
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                    } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                 />
               </div>
               {errors.email && (
@@ -134,11 +133,10 @@ export default function LoginPage() {
                     if (error) clearError();
                   }}
                   placeholder="Enter your password"
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.password
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password
                       ? "border-red-500 focus:ring-red-500"
                       : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                    } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                 />
                 <button
                   type="button"
@@ -151,6 +149,16 @@ export default function LoginPage() {
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link
+                href="/auth/forgot-password"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                Forgot your password?
+              </Link>
             </div>
 
             {/* Login Button */}

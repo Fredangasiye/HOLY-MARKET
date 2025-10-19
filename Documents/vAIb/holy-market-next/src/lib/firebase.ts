@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDcka9QoUd7D-UVNzdAWt05ITHFE07yVtQ",
   authDomain: "holy-market-d8f15.firebaseapp.com",
   projectId: "holy-market-d8f15",
-  storageBucket: "holy-market-d8f15.firebasestorage.app",
+  storageBucket: "holy-market-d8f15.appspot.com",
   messagingSenderId: "43977078996",
   appId: "1:43977078996:web:688f1f8bfb8ed88193e341",
   measurementId: "G-EB67KEGR2S"
@@ -27,16 +27,20 @@ if (isFirebaseConfigured) {
   try {
     // Initialize Firebase
     app = initializeApp(firebaseConfig);
-    
+
     // Initialize Firebase Authentication and get a reference to the service
     auth = getAuth(app);
-    
+    // Use persistent auth across sessions in the browser
+    void setPersistence(auth, browserLocalPersistence);
+
     // Initialize Google Auth Provider
     googleProvider = new GoogleAuthProvider();
-    
+    // Prompt account selection to avoid silent auto-selection
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+
     // Initialize Cloud Firestore and get a reference to the service
     db = getFirestore(app);
-    
+
     // Initialize Firebase Storage and get a reference to the service
     storage = getStorage(app);
   } catch (error) {

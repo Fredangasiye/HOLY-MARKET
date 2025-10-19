@@ -1,14 +1,16 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
+import {
   User as FirebaseUser,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -35,6 +37,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   clearError: () => void;
   updateProfileImage: (file: File) => Promise<boolean>;
+  resetPassword: (email: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -115,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           // Try to get user from Firestore first
           let userData = await getUserFromFirestore(firebaseUser.uid);
-          
+
           if (!userData) {
             // Create new user if not found in Firestore
             userData = {
@@ -128,11 +131,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               createdAt: new Date(),
               updatedAt: new Date(),
             };
-            
+
             // Save to Firestore
             await saveUserToFirestore(userData);
           }
-          
+
           setUser(userData);
         } catch (error) {
           console.error('Error handling auth state change:', error);
@@ -166,6 +169,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetPassword = async (email: string): Promise<boolean> => {
+    if (!auth) {
+      setError('Firebase authentication not configured. Please contact support.');
+      return false;
+    }
+
+    try {
+      setError(null);
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (error: any) {
+      setError(error.message || 'Failed to send password reset email');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signUp = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>, profileImage?: File): Promise<boolean> => {
     if (!auth) {
       setError('Firebase authentication not configured. Please contact support.');
@@ -175,12 +197,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setError(null);
       setLoading(true);
-      
+
       const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password || '');
       const firebaseUser = userCredential.user;
-      
+
       let profilePhotoUrl = userData.profilePhoto || '';
-      
+
       // Upload profile image if provided
       if (profileImage) {
         try {
@@ -190,13 +212,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Continue without image upload error
         }
       }
-      
+
       // Update Firebase profile
       await updateProfile(firebaseUser, {
         displayName: userData.name,
         photoURL: profilePhotoUrl,
       });
-      
+
       // Create user object
       const newUser: User = {
         id: firebaseUser.uid,
@@ -208,10 +230,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      
+
       // Save to Firestore
       await saveUserToFirestore(newUser);
-      
+
       return true;
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
@@ -230,13 +252,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setError(null);
       setLoading(true);
-      
-      const result = await signInWithPopup(auth, googleProvider);
-      const firebaseUser = result.user;
-      
+
+      let firebaseUser: FirebaseUser | null = null;
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        firebaseUser = result.user;
+      } catch (popupError: any) {
+        // Fallback to redirect if popup is blocked or fails
+        await signInWithRedirect(auth, googleProvider);
+        return true; // Redirect flow continues on reload
+      }
+
       // Check if user exists in Firestore
+      if (!firebaseUser) {
+        return true;
+      }
       let userData = await getUserFromFirestore(firebaseUser.uid);
-      
+
       if (!userData) {
         // Create new user
         userData = {
@@ -249,11 +281,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           createdAt: new Date(),
           updatedAt: new Date(),
         };
-        
+
         // Save to Firestore
         await saveUserToFirestore(userData);
       }
-      
+
       return true;
     } catch (error: any) {
       setError(error.message || 'Failed to sign in with Google');
@@ -327,6 +359,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     clearError,
     updateProfileImage,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
