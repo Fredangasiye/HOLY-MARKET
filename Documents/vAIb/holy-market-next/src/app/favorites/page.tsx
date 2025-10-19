@@ -7,53 +7,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState([
-    {
-      id: "1",
-      businessName: "Graceful Gardens",
-      category: "Landscaping",
-      description: "Christian-owned landscaping services with a focus on sustainable practices",
-      location: "Cape Town, Western Cape",
-      ownerName: "Sarah Johnson",
-      phone: "+27 82 123 4567",
-      email: "sarah@gracefulgardens.co.za",
-      whatsappNumber: "+27 82 123 4567",
-      website: "https://gracefulgardens.co.za",
-      rating: 4.8,
-      isFavorite: true,
-      image: "/api/placeholder/300/200"
-    },
-    {
-      id: "2",
-      businessName: "Faithful Accounting",
-      category: "Professional Services",
-      description: "Christian accounting firm providing honest and reliable financial services",
-      location: "Johannesburg, Gauteng",
-      ownerName: "Michael Chen",
-      phone: "+27 11 234 5678",
-      email: "michael@faithfulaccounting.co.za",
-      whatsappNumber: "+27 82 234 5678",
-      website: "https://faithfulaccounting.co.za",
-      rating: 4.9,
-      isFavorite: true,
-      image: "/api/placeholder/300/200"
-    },
-    {
-      id: "3",
-      businessName: "Kingdom Coffee",
-      category: "Food & Beverage",
-      description: "Artisan coffee roasters with a mission to support local farmers",
-      location: "Durban, KwaZulu-Natal",
-      ownerName: "David Mthembu",
-      phone: "+27 31 345 6789",
-      email: "david@kingdomcoffee.co.za",
-      whatsappNumber: "+27 82 345 6789",
-      website: "https://kingdomcoffee.co.za",
-      rating: 4.7,
-      isFavorite: true,
-      image: "/api/placeholder/300/200"
-    }
-  ]);
+  const [favorites, setFavorites] = useState([] as any[]);
 
   const removeFavorite = (id: string) => {
     setFavorites(favorites.filter(fav => fav.id !== id));
@@ -215,10 +169,10 @@ export default function FavoritesPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">No Favorites Yet</h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Start exploring businesses and save your favorites for easy access later.
+                You can add a business to favorites by tapping the heart icon on any business card.
               </p>
               <Link
-                href="/dashboard"
+                href="/christian-businesses"
                 className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Building2 size={20} className="mr-2" />
