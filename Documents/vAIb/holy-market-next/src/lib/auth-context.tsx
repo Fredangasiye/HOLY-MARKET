@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
   signOut as firebaseSignOut,
   updateProfile,
   sendPasswordResetEmail
@@ -106,6 +107,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const mapFirebaseError = (err: any): string => {
+    const code = err?.code || '';
+    switch (code) {
+      case 'auth/invalid-credential':
+        return 'Invalid credentials. Please check your email and password or try Google sign-in.';
+      case 'auth/user-not-found':
+        return 'No account found with that email.';
+      case 'auth/wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'auth/too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'auth/popup-closed-by-user':
+        return 'Sign-in window was closed before completing. Please try again.';
+      case 'auth/cancelled-popup-request':
+        return 'Another sign-in operation is in progress. Please try again.';
+      case 'auth/unauthorized-domain':
+        return 'This domain is not authorized for sign-in. Please use the official site.';
+      default:
+        return err?.message || 'Authentication failed.';
+    }
+  };
+
+  // Handle redirect result (from Google sign-in fallback)
+  useEffect(() => {
+    if (!auth) return;
+    (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const firebaseUser = result.user;
+          let userData = await getUserFromFirestore(firebaseUser.uid);
+          if (!userData) {
+            userData = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || '',
+              email: firebaseUser.email || '',
+              phone: firebaseUser.phoneNumber || '',
+              profilePhoto: firebaseUser.photoURL || '',
+              authProvider: 'google',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+            await saveUserToFirestore(userData);
+          }
+          setUser(userData);
+        }
+      } catch (err: any) {
+        setError(mapFirebaseError(err));
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     if (!auth) {
       // Firebase not configured, set loading to false
@@ -162,7 +215,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signInWithEmailAndPassword(auth, email, password);
       return true;
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in');
+      setError(mapFirebaseError(error));
       return false;
     } finally {
       setLoading(false);
@@ -181,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await sendPasswordResetEmail(auth, email);
       return true;
     } catch (error: any) {
-      setError(error.message || 'Failed to send password reset email');
+      setError(mapFirebaseError(error));
       return false;
     } finally {
       setLoading(false);
@@ -236,7 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return true;
     } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+      setError(mapFirebaseError(error));
       return false;
     } finally {
       setLoading(false);
@@ -288,7 +341,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return true;
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in with Google');
+      setError(mapFirebaseError(error));
       return false;
     } finally {
       setLoading(false);
@@ -305,7 +358,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       await firebaseSignOut(auth);
     } catch (error: any) {
-      setError(error.message || 'Failed to sign out');
+      setError(mapFirebaseError(error));
     }
   };
 
@@ -340,7 +393,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return true;
     } catch (error: any) {
-      setError(error.message || 'Failed to update profile image');
+      setError(mapFirebaseError(error));
       return false;
     } finally {
       setLoading(false);
