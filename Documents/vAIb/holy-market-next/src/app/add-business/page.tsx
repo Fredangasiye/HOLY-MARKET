@@ -1011,12 +1011,12 @@ export default function AddBusinessPage() {
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Creating Business Profile...
+                        Saving changes...
                       </>
                     ) : (
                       <>
                         <Check className="w-5 h-5" />
-                        Create Business Profile
+                        Save Changes
                       </>
                     )}
                   </button>
