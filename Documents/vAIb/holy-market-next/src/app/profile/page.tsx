@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -21,29 +21,57 @@ import {
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
+  const { user, updateUserProfile, signOut, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
-  // Mock user data
   const [userData, setUserData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+27 123 456 789",
-    location: "Cape Town, South Africa",
-    joinDate: "January 2024",
-    businessCount: 2,
-    isVerified: true
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    location: "",
+    joinDate: "",
+    businessCount: 0,
+    isVerified: false
   });
 
   const [editData, setEditData] = useState(userData);
 
-  const handleSave = () => {
-    setUserData(editData);
-    setIsEditing(false);
-    toast.success("Profile updated successfully!");
+  useEffect(() => {
+    if (!user) return;
+    const parts = (user.name || "").trim().split(" ");
+    const firstName = parts[0] || "";
+    const lastName = parts.slice(1).join(" ") || "";
+    const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "";
+    const hydrated = {
+      firstName,
+      lastName,
+      email: user.email,
+      phone: user.phone || "",
+      location: "",
+      joinDate,
+      businessCount: 0,
+      isVerified: true
+    };
+    setUserData(hydrated);
+    setEditData(hydrated);
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    const fullName = [editData.firstName, editData.lastName].filter(Boolean).join(" ");
+    const ok = await updateUserProfile({ name: fullName, phone: editData.phone });
+    if (ok) {
+      setUserData(editData);
+      setIsEditing(false);
+      toast.success("Profile updated successfully!");
+    } else {
+      toast.error("Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
@@ -51,7 +79,8 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     toast.success("Logged out successfully!");
   };
 
@@ -108,7 +137,7 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
-                  {userData.firstName[0]}{userData.lastName[0]}
+                  {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">

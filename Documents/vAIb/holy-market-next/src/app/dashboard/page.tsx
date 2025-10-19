@@ -92,8 +92,8 @@ export default function DashboardPage() {
 
 
   const handleEditProfile = () => {
-    router.push("/add-business");
-    toast.success("Redirecting to business form...");
+    router.push("/profile");
+    toast.success("Opening profile editor...");
   };
 
   const handleEditBusiness = () => {

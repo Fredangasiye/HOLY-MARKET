@@ -39,6 +39,7 @@ interface AuthContextType {
   clearError: () => void;
   updateProfileImage: (file: File) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
+  updateUserProfile: (updates: Partial<Pick<User, 'name' | 'phone' | 'profilePhoto'>>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -413,6 +414,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearError,
     updateProfileImage,
     resetPassword,
+    updateUserProfile: async (updates) => {
+      if (!user || !auth) {
+        setError('User not authenticated');
+        return false;
+      }
+      try {
+        setError(null);
+        setLoading(true);
+        const updatedUser: User = {
+          ...user,
+          name: updates.name ?? user.name,
+          phone: updates.phone ?? user.phone,
+          profilePhoto: updates.profilePhoto ?? user.profilePhoto,
+          updatedAt: new Date(),
+        };
+        await saveUserToFirestore(updatedUser);
+        // Optionally update Firebase auth profile display name
+        if (updates.name || updates.profilePhoto) {
+          await updateProfile(auth.currentUser!, {
+            displayName: updates.name ?? user.name,
+            photoURL: updates.profilePhoto ?? user.profilePhoto,
+          });
+        }
+        setUser(updatedUser);
+        return true;
+      } catch (err: any) {
+        setError(mapFirebaseError(err));
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
