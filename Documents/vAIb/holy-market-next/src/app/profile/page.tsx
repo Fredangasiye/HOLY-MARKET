@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Edit, 
-  LogOut, 
-  Settings, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Edit,
+  LogOut,
+  Settings,
   Heart,
   Building2,
   Calendar,
@@ -25,8 +25,10 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
-  const { user, updateUserProfile, signOut, loading } = useAuth();
+  const { user, updateUserProfile, updateProfileImage, signOut, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [userData, setUserData] = useState({
     firstName: "",
@@ -84,6 +86,29 @@ export default function ProfilePage() {
     toast.success("Logged out successfully!");
   };
 
+  const onPickPhoto = () => fileInputRef.current?.click();
+  const onChangePhoto: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+    setIsUploadingPhoto(true);
+    const ok = await updateProfileImage(file);
+    setIsUploadingPhoto(false);
+    if (ok) {
+      toast.success('Profile photo updated');
+    } else {
+      toast.error('Failed to update photo');
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const menuItems = [
     {
       icon: Settings,
@@ -126,7 +151,7 @@ export default function ProfilePage() {
       </header>
 
       {/* Main Content */}
-      <main className="bg-white dark:bg-gray-900 rounded-t-3xl p-6 min-h-[80vh]">
+      <main className="bg-white dark:bg-gray-900 rounded-t-3xl p-6 min-h-[80vh] pb-28">
         {/* Profile Card */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -136,8 +161,15 @@ export default function ProfilePage() {
           <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
-                  {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
+                <div className="relative mr-4">
+                  {user?.profilePhoto ? (
+                    <img src={user.profilePhoto} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
+                    </div>
+                  )}
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onChangePhoto} />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -158,6 +190,24 @@ export default function ProfilePage() {
 
             {isEditing ? (
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Profile Photo
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={onPickPhoto}
+                      disabled={isUploadingPhoto}
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg disabled:opacity-50"
+                    >
+                      {isUploadingPhoto ? 'Uploading…' : 'Change Photo'}
+                    </button>
+                    {user?.profilePhoto && (
+                      <img src={user.profilePhoto} alt="Current" className="w-10 h-10 rounded-full object-cover" />
+                    )}
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -166,7 +216,7 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={editData.firstName}
-                      onChange={(e) => setEditData({...editData, firstName: e.target.value})}
+                      onChange={(e) => setEditData({ ...editData, firstName: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
@@ -177,7 +227,7 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={editData.lastName}
-                      onChange={(e) => setEditData({...editData, lastName: e.target.value})}
+                      onChange={(e) => setEditData({ ...editData, lastName: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
@@ -189,7 +239,7 @@ export default function ProfilePage() {
                   <input
                     type="email"
                     value={editData.email}
-                    onChange={(e) => setEditData({...editData, email: e.target.value})}
+                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -200,7 +250,7 @@ export default function ProfilePage() {
                   <input
                     type="tel"
                     value={editData.phone}
-                    onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -211,7 +261,7 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     value={editData.location}
-                    onChange={(e) => setEditData({...editData, location: e.target.value})}
+                    onChange={(e) => setEditData({ ...editData, location: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -304,9 +354,8 @@ export default function ProfilePage() {
                 className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-blue-600 transition-colors"
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    theme === "dark" ? "translate-x-6" : "translate-x-1"
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${theme === "dark" ? "translate-x-6" : "translate-x-1"
+                    }`}
                 />
               </button>
             </div>
@@ -337,28 +386,28 @@ export default function ProfilePage() {
             </div>
             <span className="text-xs text-white font-medium">Home</span>
           </Link>
-          
+
           <Link href="/dashboard" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Building2 size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">Dashboard</span>
           </Link>
-          
+
           <Link href="/about" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Info size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">About</span>
           </Link>
-          
+
           <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <User size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
           </Link>
-          
+
           <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <BookOpen size={20} className="text-green-400" />
