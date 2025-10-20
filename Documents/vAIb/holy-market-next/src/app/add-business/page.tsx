@@ -340,15 +340,15 @@ export default function AddBusinessPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+        <header className="sticky top-0 z-50 bg-gray-200 dark:bg-gray-300 backdrop-blur-md border-b border-gray-300 dark:border-gray-400">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <ArrowLeft className="w-6 h-6 text-faith-blue dark:text-white" />
+                <ArrowLeft className="w-6 h-6 text-black" />
               </Link>
               <div className="flex items-center space-x-2">
                 <Building2 className="w-8 h-8 text-faith-gold" />
-                <h1 className="text-2xl font-display font-bold text-faith-blue dark:text-white">
+                <h1 className="text-2xl font-display font-bold text-black">
                   Add Your Business
                 </h1>
               </div>
