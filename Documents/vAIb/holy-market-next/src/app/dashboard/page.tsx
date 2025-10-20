@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  Church, 
-  Building2, 
-  User, 
-  Info, 
-  Plus, 
-  Search, 
-  X, 
-  Moon, 
+import {
+  Church,
+  Building2,
+  User,
+  Info,
+  Plus,
+  Search,
+  X,
+  Moon,
   Sun,
   MessageCircle,
   Phone,
@@ -37,53 +37,7 @@ import { useAuth } from "@/lib/auth-context";
 import Header from "@/components/Header";
 import MobileNavigation from "@/components/MobileNavigation";
 
-// Mock user profile data
-const userProfile = {
-  id: "user_001",
-  name: "John Smith",
-  email: "john.smith@email.com",
-  phone: "+27 123 456 789",
-  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-  location: "Cape Town, South Africa",
-  memberSince: "January 2023",
-  bio: "Passionate Christian entrepreneur dedicated to building businesses that honor God and serve communities.",
-  interests: ["Business Development", "Christian Leadership", "Community Service"],
-  stats: {
-    businessesOwned: 1,
-    connections: 47,
-    reviews: 23,
-    rating: 4.8
-  }
-};
-
-// Mock business profile data
-const userBusiness = {
-  id: "business_001",
-  businessName: "Graceful Gardens",
-  category: "Landscaping",
-  description: "Christian-owned landscaping services creating beautiful outdoor spaces with integrity and excellence.",
-  location: "Cape Town, South Africa",
-  phone: "+27 123 456 789",
-  whatsappNumber: "+27 123 456 789",
-  email: "info@gracefulgardens.co.za",
-  website: "www.gracefulgardens.co.za",
-  image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
-  founded: "2019",
-  employees: "5-10",
-  services: ["Garden Design", "Landscaping", "Maintenance", "Tree Services"],
-  mission: "To create beautiful outdoor spaces that reflect God's creation while serving our community with excellence and integrity.",
-  socialMedia: {
-    facebook: "https://facebook.com/gracefulgardens",
-    instagram: "https://instagram.com/gracefulgardens",
-    linkedin: "https://linkedin.com/company/gracefulgardens"
-  },
-  stats: {
-    totalProjects: 156,
-    happyCustomers: 142,
-    averageRating: 4.9,
-    yearsInBusiness: 5
-  }
-};
+// Removed mock data: show real user data or empty state
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -168,7 +122,7 @@ export default function DashboardPage() {
                       Sign In
                     </motion.button>
                   </Link>
-                  
+
                   <Link href="/auth/register">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -196,7 +150,7 @@ export default function DashboardPage() {
   }
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
+    <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       <Header title="Dashboard" showBackButton={true} backPath="/" />
 
       {/* Tab Navigation */}
@@ -205,22 +159,20 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-3 justify-center">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
-                activeTab === "profile"
+              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeTab === "profile"
                   ? "bg-faith-gold text-faith-blue font-semibold"
                   : "bg-white/20 text-white hover:bg-white/30"
-              }`}
+                }`}
             >
               <User className="w-4 h-4" />
               Profile
             </button>
             <button
               onClick={() => setActiveTab("business")}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
-                activeTab === "business"
+              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeTab === "business"
                   ? "bg-faith-gold text-faith-blue font-semibold"
                   : "bg-white/20 text-white hover:bg-white/30"
-              }`}
+                }`}
             >
               <Building2 className="w-4 h-4" />
               My Business
@@ -241,14 +193,8 @@ export default function DashboardPage() {
               {/* Profile Card */}
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mb-8">
                 <div className="flex items-start gap-6 mb-6">
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20">
-                    <img
-                      src={userProfile.avatar}
-                      alt={userProfile.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
+                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20" />
+
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -263,7 +209,7 @@ export default function DashboardPage() {
                           <span>Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
                         </div>
                       </div>
-                      
+
                       <button
                         onClick={handleEditProfile}
                         className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors flex items-center gap-2"
@@ -272,14 +218,14 @@ export default function DashboardPage() {
                         Edit Profile
                       </button>
                     </div>
-                    
+
                     <p className="text-white/80 text-lg leading-relaxed mb-6">
-                      {user?.authProvider === 'google' 
+                      {user?.authProvider === 'google'
                         ? 'Welcome to the Christian business community! Connect with like-minded entrepreneurs and grow your business with Kingdom values.'
                         : 'Passionate Christian entrepreneur dedicated to building businesses that honor God and serve communities.'
                       }
                     </p>
-                    
+
                     {/* Auth Provider */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-white mb-3">Account Type</h3>
@@ -294,7 +240,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 bg-white/5 rounded-lg">
@@ -334,22 +280,22 @@ export default function DashboardPage() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">{userBusiness.businessName}</h2>
-                        <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{userBusiness.category}</p>
+                        <h2 className="text-3xl font-display font-bold text-white mb-2">Your Business</h2>
+                        <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">Not set yet</p>
                         <div className="flex items-center gap-2 text-white/70 mb-2">
                           <MapPin className="w-4 h-4" />
-                          <span>{userBusiness.location}</span>
+                          <span>Location not set</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/70">
                           <Calendar className="w-4 h-4" />
-                          <span>Founded {userBusiness.founded}</span>
+                          <span>Founded —</span>
                         </div>
                       </div>
-                      
+
                       <button
                         onClick={handleEditBusiness}
                         className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors flex items-center gap-2"
@@ -358,21 +304,17 @@ export default function DashboardPage() {
                         Edit Business
                       </button>
                     </div>
-                    
-                    <p className="text-white/80 text-lg leading-relaxed mb-6">{userBusiness.description}</p>
-                    
+
+                    <p className="text-white/80 text-lg leading-relaxed mb-6">No description yet. Use Add Business to create your profile.</p>
+
                     {/* Services */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-white mb-3">Services</h3>
                       <div className="flex flex-wrap gap-2">
-                        {userBusiness.services.map((service, index) => (
-                          <span key={index} className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
-                            {service}
-                          </span>
-                        ))}
+                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">No services yet</span>
                       </div>
                     </div>
-                    
+
                     {/* Mission */}
                     <div className="bg-white/5 rounded-lg p-4 mb-6">
                       <h3 className="text-lg font-semibold text-white mb-2">Mission Statement</h3>
@@ -380,27 +322,27 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Business Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userBusiness.stats.totalProjects}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Projects</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userBusiness.stats.happyCustomers}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Customers</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userBusiness.stats.averageRating}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0.0</div>
                     <div className="text-white/70 text-sm">Rating</div>
                   </div>
                   <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">{userBusiness.stats.yearsInBusiness}</div>
+                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                     <div className="text-white/70 text-sm">Years</div>
                   </div>
                 </div>
-                
+
                 {/* Contact Info */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -408,31 +350,31 @@ export default function DashboardPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-white/70">
                         <Phone className="w-4 h-4" />
-                        <span>{userBusiness.phone}</span>
+                        <span>-</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/70">
                         <Mail className="w-4 h-4" />
-                        <span>{userBusiness.email}</span>
+                        <span>-</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/70">
                         <Globe className="w-4 h-4" />
-                        <span>{userBusiness.website}</span>
+                        <span>-</span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-3">Social Media</h3>
                     <div className="space-y-2">
-                      <a href={userBusiness.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                      <a href="#" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors pointer-events-none opacity-50">
                         <ExternalLink className="w-4 h-4" />
                         <span>Facebook</span>
                       </a>
-                      <a href={userBusiness.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                      <a href="#" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors pointer-events-none opacity-50">
                         <ExternalLink className="w-4 h-4" />
                         <span>Instagram</span>
                       </a>
-                      <a href={userBusiness.socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                      <a href="#" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors pointer-events-none opacity-50">
                         <ExternalLink className="w-4 h-4" />
                         <span>LinkedIn</span>
                       </a>
@@ -446,6 +388,6 @@ export default function DashboardPage() {
       </section>
 
       <MobileNavigation />
-      </div>
+    </div>
   );
 }

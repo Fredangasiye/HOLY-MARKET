@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -32,6 +32,7 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function AddBusinessPage() {
   const { user, loading } = useAuth();
+  const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -352,6 +353,18 @@ export default function AddBusinessPage() {
                 </h1>
               </div>
             </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => formRef.current?.requestSubmit()}
+                disabled={isSubmitting}
+                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
+                  isSubmitting ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
+                }`}
+              >
+                {isSubmitting ? 'Saving…' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </header>
 
@@ -479,7 +492,7 @@ export default function AddBusinessPage() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto"
           >
-            <form onSubmit={handleSubmit} className="space-y-8">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {/* Business Information Section */}
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                 <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
@@ -1003,8 +1016,8 @@ export default function AddBusinessPage() {
                   type="submit"
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 px-8 py-4 font-semibold rounded-lg transition-colors ${isSubmitting
-                      ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                      : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
+                    ? 'bg-white/20 text-white/50 cursor-not-allowed'
+                    : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
                     }`}
                 >
                   {isSubmitting ? (
