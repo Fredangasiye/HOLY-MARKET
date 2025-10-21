@@ -53,7 +53,7 @@ export default function MobileNavigation() {
               <motion.div
                 className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
                   isActive 
-                    ? 'bg-purple-100 dark:bg-purple-900/50 shadow-lg' 
+                    ? 'bg-gray-900 dark:bg-white/10 shadow-lg' 
                     : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
                 whileHover={{ scale: 1.1 }}
@@ -63,14 +63,14 @@ export default function MobileNavigation() {
                   size={20} 
                   className={`transition-colors duration-200 ${
                     isActive 
-                      ? 'text-purple-600 dark:text-purple-400' 
+                      ? 'text-white' 
                       : item.color
                   }`} 
                 />
               </motion.div>
               <span className={`text-xs font-medium transition-colors duration-200 ${
                 isActive 
-                  ? 'text-purple-600 dark:text-purple-400' 
+                  ? 'text-gray-900 dark:text-white' 
                   : 'text-gray-600 dark:text-gray-400'
               }`}>
                 {item.label}
