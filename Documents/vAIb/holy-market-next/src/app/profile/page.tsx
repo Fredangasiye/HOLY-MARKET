@@ -63,12 +63,14 @@ export default function ProfilePage() {
     };
     setUserData(hydrated);
     setEditData(hydrated);
-    
-    // Clear preview when user photo updates from context (after successful upload)
-    if (user.profilePhoto) {
+  }, [user]);
+
+  // Clear preview when user photo updates from context (after successful upload)
+  useEffect(() => {
+    if (user?.profilePhoto && photoPreview) {
       setPhotoPreview(null);
     }
-  }, [user?.profilePhoto]);
+  }, [user?.profilePhoto, photoPreview]);
 
   const handleSave = async () => {
     if (!user) return;
