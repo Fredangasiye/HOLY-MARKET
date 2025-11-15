@@ -243,8 +243,22 @@ export default function DashboardPage() {
                 <div className="flex items-start gap-6 mb-6">
                   <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 ring-2 ring-faith-gold/60">
                     {user?.profilePhoto ? (
-                      <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-                    ) : null}
+                      <img 
+                        src={user.profilePhoto} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const localPhoto = typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : null;
+                          if (localPhoto) {
+                            (e.target as HTMLImageElement).src = localPhoto;
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-faith-gold/30 flex items-center justify-center text-white text-2xl font-bold">
+                        {(user?.name?.[0] || 'U').toUpperCase()}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1">

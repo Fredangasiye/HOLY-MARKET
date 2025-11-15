@@ -62,10 +62,6 @@ export default function ProfilePage() {
     };
     setUserData(hydrated);
     setEditData(hydrated);
-    // Ensure persisted local photo is available on next auth change
-    if (!user.profilePhoto && typeof window !== 'undefined') {
-      void localStorage.getItem('profilePhoto');
-    }
   }, [user]);
 
   const handleSave = async () => {
@@ -102,10 +98,26 @@ export default function ProfilePage() {
       return;
     }
     setIsUploadingPhoto(true);
+    
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl && user) {
+        // Update user state immediately for preview
+        const updatedUser = { ...user, profilePhoto: dataUrl };
+        // Force re-render by updating user context
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('profilePhoto', dataUrl);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+    
     const ok = await updateProfileImage(file);
     setIsUploadingPhoto(false);
     if (ok) {
-      // Photo updated successfully
+      // Photo updated successfully - user state will update via auth context
     } else {
       toast.error('Failed to update photo. Please try again.');
     }
@@ -173,17 +185,27 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <div className="relative mr-4">
-                  {(() => {
-                    const localPhoto = typeof window !== 'undefined' ? (localStorage.getItem('profilePhoto') || '') : '';
-                    const displayPhoto = user?.profilePhoto || localPhoto;
-                    return displayPhoto ? (
-                      <img src={displayPhoto} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
-                    ) : (
-                      <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                        {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
-                      </div>
-                    );
-                  })()}
+                  {user?.profilePhoto ? (
+                    <img 
+                      src={user.profilePhoto} 
+                      alt="Profile" 
+                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-500" 
+                      onError={(e) => {
+                        // Fallback to localStorage if Firebase URL fails
+                        const localPhoto = typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : null;
+                        if (localPhoto) {
+                          (e.target as HTMLImageElement).src = localPhoto;
+                        } else {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
+                    </div>
+                  )}
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onChangePhoto} />
                 </div>
                 <div>
