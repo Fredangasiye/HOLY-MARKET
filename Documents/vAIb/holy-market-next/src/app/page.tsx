@@ -16,9 +16,8 @@ export default function HomePage() {
   const { user } = useAuth();
 
   const handleFABClick = () => {
-    router.push("/add-business");
-    toast.success("Adding new business...");
-    // Add haptic feedback for mobile
+    const hasBusiness = typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true';
+    router.push(hasBusiness ? "/dashboard?tab=business" : "/add-business");
     if (navigator.vibrate) {
       navigator.vibrate(50);
     }
@@ -45,7 +44,7 @@ export default function HomePage() {
           >
             HOLY-MARKET ✝️
           </motion.h1>
-          
+
           <motion.p
             className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -61,8 +60,8 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <Link href="/add-business" className="px-8 py-4 bg-purple-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-lg">
-              Add a Business
+            <Link href={typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true' ? "/dashboard?tab=business" : "/add-business"} className="px-8 py-4 bg-purple-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-lg">
+              {typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true' ? 'My Business' : 'Add a Business'}
             </Link>
             <Link href="/christian-businesses" className="px-8 py-4 bg-white/20 text-white font-bold rounded-full hover:scale-105 transition-transform backdrop-blur-sm">
               Browse Christian Businesses
@@ -86,7 +85,7 @@ export default function HomePage() {
           >
             Explore Our Platform
           </motion.h2>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -94,7 +93,7 @@ export default function HomePage() {
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             <Link href="/christian-businesses" className="group">
-              <motion.div 
+              <motion.div
                 className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
@@ -107,9 +106,9 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </Link>
-            
+
             <Link href="/community" className="group">
-              <motion.div 
+              <motion.div
                 className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
@@ -122,9 +121,9 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </Link>
-            
+
             <Link href="/kingdom-values" className="group">
-              <motion.div 
+              <motion.div
                 className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-faith-gold/50 transition-all duration-300 cursor-pointer h-full"
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
@@ -137,9 +136,9 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </Link>
-            
+
             <Link href="/christian-catalogue" className="group">
-              <motion.div 
+              <motion.div
                 className="text-center p-8 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-emerald-400/50 transition-all duration-300 cursor-pointer h-full"
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}

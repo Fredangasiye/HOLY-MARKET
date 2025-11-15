@@ -43,21 +43,39 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
   const { user, signOut, loading } = useAuth();
+  const [hasBusiness, setHasBusiness] = useState(false);
+  const [business, setBusiness] = useState<any | null>(null);
+
+  useEffect(() => {
+    try {
+      setHasBusiness(localStorage.getItem('hasBusiness') === 'true');
+      const saved = localStorage.getItem('businessProfile');
+      setBusiness(saved ? JSON.parse(saved) : null);
+    } catch { }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'business' || tab === 'profile') {
+        setActiveTab(tab);
+      }
+    } catch { }
+  }, []);
 
 
   const handleEditProfile = () => {
     router.push("/profile");
-    toast.success("Opening profile editor...");
   };
 
   const handleEditBusiness = () => {
     router.push("/add-business");
-    toast.success("Redirecting to business form...");
   };
 
   const handleSignOut = async () => {
     await signOut();
-    toast.success("Signed out successfully!");
     router.push("/");
   };
 
@@ -75,15 +93,15 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-gray-200 dark:bg-gray-300 backdrop-blur-md border-b border-gray-300 dark:border-gray-400">
+        <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/" className="p-2 rounded-full hover:bg-black/10 transition-colors">
-                <ArrowLeft className="w-6 h-6 text-black" />
+              <Link href="/" className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                <ArrowLeft className="w-6 h-6 text-white" />
               </Link>
               <div className="flex items-center space-x-2">
                 <Building2 className="w-8 h-8 text-faith-gold" />
-                <h1 className="text-2xl font-display font-bold text-black">
+                <h1 className="text-2xl font-display font-bold text-white">
                   Dashboard
                 </h1>
               </div>
@@ -150,18 +168,20 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
+    <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold overflow-x-hidden">
       <Header title="Dashboard" showBackButton={true} backPath="/" />
 
       {/* Tab Navigation */}
       <section className="py-6 bg-white/10 dark:bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center" role="tablist" aria-label="Dashboard tabs">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeTab === "profile"
-                  ? "bg-faith-gold text-faith-blue font-semibold"
-                  : "bg-white/20 text-white hover:bg-white/30"
+              role="tab"
+              aria-selected={activeTab === "profile"}
+              className={`flex items-center gap-2 px-7 py-3 rounded-full transition-all duration-300 border-2 ${activeTab === "profile"
+                ? "bg-faith-gold text-faith-blue font-semibold border-faith-gold shadow-md"
+                : "bg-transparent text-white hover:bg-white/10 border-transparent"
                 }`}
             >
               <User className="w-4 h-4" />
@@ -169,9 +189,11 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setActiveTab("business")}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeTab === "business"
-                  ? "bg-faith-gold text-faith-blue font-semibold"
-                  : "bg-white/20 text-white hover:bg-white/30"
+              role="tab"
+              aria-selected={activeTab === "business"}
+              className={`flex items-center gap-2 px-7 py-3 rounded-full transition-all duration-300 border-2 ${activeTab === "business"
+                ? "bg-faith-gold text-faith-blue font-semibold border-faith-gold shadow-md"
+                : "bg-transparent text-white hover:bg-white/10 border-transparent"
                 }`}
             >
               <Building2 className="w-4 h-4" />
@@ -181,60 +203,95 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* Hero Welcome Strip */}
+      <section className="pt-4">
+        <div className="container mx-auto px-4">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-faith-gold/30 via-white/10 to-faith-gold/20 dark:from-faith-gold/20 dark:via-white/5 dark:to-faith-gold/10 border border-white/20 shadow-xl">
+            <div className="px-5 py-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <User className="text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-white/80 text-xs">Welcome back</p>
+                <h2 className="text-white text-lg font-semibold leading-tight">{user?.name || 'Kingdom Entrepreneur'}</h2>
+              </div>
+              <div className="hidden sm:flex gap-2">
+                <Link
+                  href={hasBusiness ? "/dashboard?tab=business" : "/add-business"}
+                  className="px-3 py-2 rounded-lg bg-faith-gold text-faith-blue text-sm font-semibold hover:bg-faith-gold/80 transition-colors"
+                >
+                  {hasBusiness ? 'My Business' : 'Add Business'}
+                </Link>
+                <Link href="/favorites" className="px-3 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 border border-white/20 transition-colors">Favorites</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Content */}
-      <section className="py-8">
+      <section className="py-8 pb-28">
         <div className="container mx-auto px-4">
           {activeTab === "profile" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="max-w-4xl mx-auto"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               {/* Profile Card */}
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mb-8">
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
                 <div className="flex items-start gap-6 mb-6">
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20" />
+                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 ring-2 ring-faith-gold/60">
+                    {user?.profilePhoto ? (
+                      <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                    ) : null}
+                  </div>
 
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">{user?.name || 'User'}</h2>
-                        <p className="text-faith-gold font-medium mb-2">{user?.email || 'user@example.com'}</p>
-                        <div className="flex items-center gap-2 text-white/70 mb-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{user?.phone || 'No phone number'}</span>
-                        </div>
+                      <div className="space-y-1">
+                        <h2 className="text-2xl md:text-3xl font-display font-bold text-white">{user?.name || 'User'}</h2>
+                        <p className="text-white/80 text-sm md:text-base">{user?.email || 'user@example.com'}</p>
                         <div className="flex items-center gap-2 text-white/70">
+                          <Phone className="w-4 h-4" />
+                          <span className="text-sm md:text-base">{user?.phone || 'No phone number'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60">
                           <Calendar className="w-4 h-4" />
-                          <span>Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
+                          <span className="text-xs md:text-sm">Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
                         </div>
                       </div>
 
+                      {/* Removed top-right edit to keep primary action below info */}
+                    </div>
+                    {/* Primary Edit Profile action below details (mobile-first) */}
+                    <div className="mt-4 mb-4">
                       <button
+                        aria-label="Edit Profile"
                         onClick={handleEditProfile}
-                        className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors flex items-center gap-2"
+                        className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-faith-gold text-faith-blue font-semibold hover:bg-faith-gold/80 transition-colors shadow-lg hover:shadow-xl"
                       >
                         <Edit className="w-4 h-4" />
                         Edit Profile
                       </button>
                     </div>
 
-                    <p className="text-white/80 text-lg leading-relaxed mb-6">
+                    <p className="text-white/80 text-base leading-relaxed mb-6">
                       {user?.authProvider === 'google'
                         ? 'Welcome to the Christian business community! Connect with like-minded entrepreneurs and grow your business with Kingdom values.'
                         : 'Passionate Christian entrepreneur dedicated to building businesses that honor God and serve communities.'
                       }
                     </p>
 
-                    {/* Auth Provider */}
+                    {/* Account Type */}
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-white mb-3">Account Type</h3>
+                      <h3 className="text-sm font-semibold text-white/90 mb-2 tracking-wide">ACCOUNT</h3>
                       <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
-                          {user?.authProvider === 'google' ? 'Google Account' : 'Email Account'}
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 text-white rounded-full text-xs border border-white/20">
+                          <User className="w-3.5 h-3.5" /> {user?.authProvider === 'google' ? 'Google Account' : 'Email Account'}
                         </span>
-                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">
-                          Christian Business Member
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 text-white rounded-full text-xs border border-white/20">
+                          <Building2 className="w-3.5 h-3.5" /> Christian Business Member
                         </span>
                       </div>
                     </div>
@@ -242,23 +299,43 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Businesses</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Connections</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Reviews</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">5.0</div>
-                    <div className="text-white/70 text-sm">Rating</div>
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: 'Businesses', value: 0, icon: Building2 },
+                    { label: 'Connections', value: 0, icon: Users },
+                    { label: 'Reviews', value: 0, icon: MessageCircle },
+                    { label: 'Rating', value: '5.0', icon: Star }
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                        <s.icon className="w-4 h-4 text-faith-gold" />
+                      </div>
+                      <div>
+                        <div className="text-base font-bold text-faith-gold leading-none">{s.value}</div>
+                        <div className="text-xs text-white/70">{s.label}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Actions Card */}
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { icon: Settings, title: 'Account Settings', href: '/settings/account' },
+                    { icon: Building2, title: 'My Businesses', href: '/company' },
+                    { icon: Heart, title: 'Favorites', href: '/favorites' },
+                    { icon: Info, title: 'Privacy & Security', href: '/settings/privacy' },
+                  ].map((item) => (
+                    <Link key={item.title} href={item.href} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition">
+                      <div className="p-2 bg-blue-100/30 rounded-lg">
+                        <item.icon className="text-blue-300" size={18} />
+                      </div>
+                      <span className="text-sm text-white">{item.title}</span>
+                    </Link>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -268,31 +345,25 @@ export default function DashboardPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="max-w-4xl mx-auto"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               {/* Business Card */}
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mb-8">
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
                 <div className="flex items-start gap-6 mb-6">
-                  <div className="w-32 h-32 rounded-xl overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20">
-                    <img
-                      src={userBusiness.image}
-                      alt={userBusiness.businessName}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <div className="w-32 h-32 rounded-xl overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20" />
 
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h2 className="text-3xl font-display font-bold text-white mb-2">Your Business</h2>
-                        <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">Not set yet</p>
+                        <h2 className="text-3xl font-display font-bold text-white mb-2">{business?.businessName || 'Your Business'}</h2>
+                        <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{business?.category || 'Not set yet'}</p>
                         <div className="flex items-center gap-2 text-white/70 mb-2">
                           <MapPin className="w-4 h-4" />
-                          <span>Location not set</span>
+                          <span>{business?.city && business?.province ? `${business.city}, ${business.province}` : 'Location not set'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/70">
                           <Calendar className="w-4 h-4" />
-                          <span>Founded —</span>
+                          <span>Founded {business?.foundedYear || '—'}</span>
                         </div>
                       </div>
 
@@ -305,42 +376,48 @@ export default function DashboardPage() {
                       </button>
                     </div>
 
-                    <p className="text-white/80 text-lg leading-relaxed mb-6">No description yet. Use Add Business to create your profile.</p>
+                    <p className="text-white/80 text-lg leading-relaxed mb-6">{business?.description || 'No description yet. Use Add Business to create your profile.'}</p>
 
                     {/* Services */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-white mb-3">Services</h3>
                       <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">No services yet</span>
+                        {business?.services && business.services.length > 0 ? (
+                          business.services.map((s: string) => (
+                            <span key={s} className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">{s}</span>
+                          ))
+                        ) : (
+                          <span className="px-3 py-1 bg-white/10 text-white rounded-full text-sm">No services yet</span>
+                        )}
                       </div>
                     </div>
 
                     {/* Mission */}
                     <div className="bg-white/5 rounded-lg p-4 mb-6">
                       <h3 className="text-lg font-semibold text-white mb-2">Mission Statement</h3>
-                      <p className="text-white/90 italic">"{userBusiness.mission}"</p>
+                      <p className="text-white/90 italic">{business?.missionStatement ? `"${business.missionStatement}"` : '"No mission statement yet"'}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Business Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Projects</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Customers</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0.0</div>
-                    <div className="text-white/70 text-sm">Rating</div>
-                  </div>
-                  <div className="text-center p-4 bg-white/5 rounded-lg">
-                    <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
-                    <div className="text-white/70 text-sm">Years</div>
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  {[
+                    { label: 'Projects', value: 0, icon: TrendingUp },
+                    { label: 'Customers', value: 0, icon: Users },
+                    { label: 'Rating', value: '0.0', icon: Star },
+                    { label: 'Years', value: 0, icon: Calendar }
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                        <s.icon className="w-4 h-4 text-faith-gold" />
+                      </div>
+                      <div>
+                        <div className="text-base font-bold text-faith-gold leading-none">{s.value}</div>
+                        <div className="text-xs text-white/70">{s.label}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Contact Info */}
@@ -350,15 +427,15 @@ export default function DashboardPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-white/70">
                         <Phone className="w-4 h-4" />
-                        <span>-</span>
+                        <span>{business?.phone || '-'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/70">
                         <Mail className="w-4 h-4" />
-                        <span>-</span>
+                        <span>{business?.email || '-'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/70">
                         <Globe className="w-4 h-4" />
-                        <span>-</span>
+                        <span>{business?.website || '-'}</span>
                       </div>
                     </div>
                   </div>
@@ -380,6 +457,16 @@ export default function DashboardPage() {
                       </a>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Contact & Links Card */}
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+                <h3 className="text-lg font-semibold text-white mb-3">Contact & Links</h3>
+                <div className="grid grid-cols-1 gap-3 text-white/80 text-sm">
+                  <div className="flex items-center gap-2"><Phone className="w-4 h-4" /><span>-</span></div>
+                  <div className="flex items-center gap-2"><Mail className="w-4 h-4" /><span>-</span></div>
+                  <div className="flex items-center gap-2"><Globe className="w-4 h-4" /><span>-</span></div>
                 </div>
               </div>
             </motion.div>

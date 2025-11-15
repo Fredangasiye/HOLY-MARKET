@@ -18,15 +18,11 @@ export default function Header({ title, showBackButton = false, backPath }: Head
   const { user, signOut } = useAuth();
 
   const handleBackClick = () => {
-    if (backPath) {
-      router.push(backPath);
-    } else {
-      router.back();
-    }
+    router.back();
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-200 dark:bg-gray-300 backdrop-blur-md border-b border-gray-300 dark:border-gray-400">
+    <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -38,17 +34,17 @@ export default function Header({ title, showBackButton = false, backPath }: Head
               onClick={handleBackClick}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors"
+              className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-black" />
+              <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
           )}
-          <Heart className="w-8 h-8 text-black" />
-          <h1 className="text-2xl font-display font-bold text-black">
+          <Heart className="w-8 h-8 text-white" />
+          <h1 className="text-2xl font-display font-bold text-white">
             {title || "HOLY-MARKET"}
           </h1>
         </motion.div>
-        
+
         <div className="flex items-center gap-2">
           {user ? (
             <>
@@ -56,31 +52,30 @@ export default function Header({ title, showBackButton = false, backPath }: Head
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors"
+                  className="p-2 rounded-full bg-green-500/20 hover:bg-green-500/30 transition-colors"
                 >
-                  <User className="w-5 h-5 text-black" />
+                  <User className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </motion.button>
               </Link>
               <motion.button
                 onClick={async () => {
                   await signOut();
-                  toast.success("Signed out successfully!");
                 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors"
+                className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/30 transition-colors"
               >
-                <LogIn className="w-5 h-5 text-black" />
+                <LogIn className="w-5 h-5 text-red-600 dark:text-red-400" />
               </motion.button>
             </>
           ) : (
-            <Link href="/add-business">
+            <Link href={typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true' ? "/dashboard?tab=business" : "/add-business"}>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-black/10 text-black font-semibold rounded-lg hover:bg-black/20 transition-colors"
+                className="px-4 py-2 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-colors"
               >
-                Add Your Business
+                {typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true' ? 'My Business' : 'Add Your Business'}
               </motion.button>
             </Link>
           )}
@@ -88,9 +83,9 @@ export default function Header({ title, showBackButton = false, backPath }: Head
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors"
+              className="p-2 rounded-full bg-blue-500/20 hover:bg-blue-500/30 transition-colors"
             >
-              <Settings className="w-5 h-5 text-black" />
+              <Settings className="w-5 h-5 text-white" />
             </motion.button>
           </Link>
         </div>

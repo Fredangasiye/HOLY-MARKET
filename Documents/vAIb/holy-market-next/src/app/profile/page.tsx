@@ -18,6 +18,7 @@ import {
   Info,
   BookOpen
 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -61,6 +62,10 @@ export default function ProfilePage() {
     };
     setUserData(hydrated);
     setEditData(hydrated);
+    // Ensure persisted local photo is available on next auth change
+    if (!user.profilePhoto && typeof window !== 'undefined') {
+      void localStorage.getItem('profilePhoto');
+    }
   }, [user]);
 
   const handleSave = async () => {
@@ -70,9 +75,8 @@ export default function ProfilePage() {
     if (ok) {
       setUserData(editData);
       setIsEditing(false);
-      toast.success("Profile updated successfully!");
     } else {
-      toast.error("Failed to update profile");
+      toast.error("Failed to update profile. Please try again.");
     }
   };
 
@@ -83,7 +87,6 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await signOut();
-    toast.success("Logged out successfully!");
   };
 
   const onPickPhoto = () => fileInputRef.current?.click();
@@ -102,9 +105,9 @@ export default function ProfilePage() {
     const ok = await updateProfileImage(file);
     setIsUploadingPhoto(false);
     if (ok) {
-      toast.success('Profile photo updated');
+      // Photo updated successfully
     } else {
-      toast.error('Failed to update photo');
+      toast.error('Failed to update photo. Please try again.');
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -138,8 +141,16 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
-      {/* Header */}
+      {/* Header with Back */}
       <header className="relative p-6 pt-12">
+        <div className="absolute left-4 top-12">
+          <Link
+            href={typeof document !== 'undefined' && document.referrer.includes('/dashboard') ? '/dashboard' : '/'}
+            className="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20"
+          >
+            <ArrowLeft className="w-5 h-5 text-black dark:text-white" />
+          </Link>
+        </div>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,13 +173,17 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <div className="relative mr-4">
-                  {user?.profilePhoto ? (
-                    <img src={user.profilePhoto} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                      {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
-                    </div>
-                  )}
+                  {(() => {
+                    const localPhoto = typeof window !== 'undefined' ? (localStorage.getItem('profilePhoto') || '') : '';
+                    const displayPhoto = user?.profilePhoto || localPhoto;
+                    return displayPhoto ? (
+                      <img src={displayPhoto} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
+                      </div>
+                    );
+                  })()}
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onChangePhoto} />
                 </div>
                 <div>
@@ -256,14 +271,20 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Location
+                    Location (South Africa)
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={editData.location}
                     onChange={(e) => setEditData({ ...editData, location: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                  >
+                    <option value="">Select city</option>
+                    {[
+                      'Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth', 'East London', 'Bloemfontein', 'Polokwane', 'Nelspruit', 'Kimberley', 'Rustenburg', 'Pietermaritzburg', 'George', 'Welkom', 'Vereeniging', 'Krugersdorp', 'Benoni', 'Boksburg', 'Brakpan', 'Springs', 'Kempton Park', 'Germiston', 'Randburg', 'Roodepoort', 'Soweto', 'Tembisa', 'Midrand', 'Centurion', 'Mthatha', 'Gqeberha', 'Stellenbosch', 'Somerset West', 'Mossel Bay', 'Knysna', 'Richards Bay', 'Newcastle', 'Klerksdorp', 'Potchefstroom', 'Vanderbijlpark', 'Secunda'
+                    ].map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -377,45 +398,7 @@ export default function ProfilePage() {
         </motion.section>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10">
-        <div className="flex justify-around items-center py-3">
-          <Link href="/" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Church size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Home</span>
-          </Link>
-
-          <Link href="/dashboard" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Building2 size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Dashboard</span>
-          </Link>
-
-          <Link href="/about" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Info size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">About</span>
-          </Link>
-
-          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <User size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
-          </Link>
-
-          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <BookOpen size={20} className="text-green-400" />
-            </div>
-            <span className="text-xs text-green-400 font-medium">Catalogue</span>
-          </Link>
-        </div>
-      </nav>
+      {/* Footer handled globally by MobileNavigation */}
     </div>
   );
 }

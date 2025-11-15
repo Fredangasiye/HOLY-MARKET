@@ -3,10 +3,11 @@
 import { motion } from "framer-motion";
 import { BookOpen, Search, Filter, Download, Star, Heart, Church, User, Info, ArrowLeft, ExternalLink, Play, FileText, Video, Music, Image, Building2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function ChristianCataloguePage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
 
@@ -166,11 +167,137 @@ export default function ChristianCataloguePage() {
     }
   ];
 
+  // External curated resources
+  const saResources = [
+    {
+      name: "BibleSA",
+      type: "Bible & Study",
+      desc: "Free Bibles in all 11 SA languages, reading plans, and devotionals.",
+      cost: "Free",
+      link: "https://www.biblesa.co.za",
+    },
+    {
+      name: "Humanitas",
+      type: "Counselling",
+      desc: "Free online sessions with intern counsellors (Christian-friendly)",
+      cost: "Free / Donation",
+      link: "https://www.humanitas.co.za",
+    },
+    {
+      name: "Hope House Counselling Centre",
+      type: "Counselling",
+      desc: "Lay Christian counselling, affordable and confidential",
+      cost: "Sliding scale",
+      link: "https://www.hopehouse.org.za",
+    },
+    {
+      name: "The Sanctuary SA",
+      type: "Therapy",
+      desc: "Christian counselling and mentorship",
+      cost: "Sliding scale",
+      link: "https://www.thesanctuarysa.org",
+    },
+    {
+      name: "Rosebank Union Church",
+      type: "Church",
+      desc: "Multicultural Joburg church with sermons & podcasts online",
+      cost: "Free",
+      link: "https://www.rosebankunion.org.za",
+    },
+    {
+      name: "Cornerstone Church Bedfordview",
+      type: "Church",
+      desc: "Charismatic church with media library & outreach",
+      cost: "Free",
+      link: "https://cornerstonechurch.co.za",
+    },
+    {
+      name: "Revelation Church",
+      type: "Church",
+      desc: "Fast-growing church led by Prophet Lovy Elias’ SA branch",
+      cost: "Free",
+      link: "https://www.revelationchurchjhb.org",
+    },
+    {
+      name: "UNISA Theology Department",
+      type: "Education",
+      desc: "Online accredited Christian studies & theology degrees",
+      cost: "Paid",
+      link: "https://www.unisa.ac.za",
+    },
+  ];
+
+  const internationalResources = [
+    {
+      name: "YouVersion Bible App",
+      type: "Bible & Devotionals",
+      desc: "Huge library of Bible versions, audio, and plans",
+      cost: "Free",
+      link: "https://www.bible.com",
+    },
+    {
+      name: "BibleProject",
+      type: "Visual Theology",
+      desc: "Animated videos, podcasts, and courses exploring Scripture deeply",
+      cost: "Free",
+      link: "https://www.bibleproject.com",
+    },
+    {
+      name: "RightNow Media",
+      type: "Streaming",
+      desc: "\"Netflix of Christian content\" for individuals & churches",
+      cost: "Paid (Free via partner churches)",
+      link: "https://www.rightnowmedia.org",
+    },
+    {
+      name: "Desiring God",
+      type: "Teachings",
+      desc: "Solid biblical articles, sermons, and guides by John Piper",
+      cost: "Free",
+      link: "https://www.desiringgod.org",
+    },
+    {
+      name: "Crossway",
+      type: "Books & Study",
+      desc: "Premium theology books, devotionals, ESV Bible materials",
+      cost: "Paid",
+      link: "https://www.crossway.org",
+    },
+    {
+      name: "Alpha International",
+      type: "Courses",
+      desc: "Global Christian introduction courses for seekers",
+      cost: "Free",
+      link: "https://www.alpha.org",
+    },
+    {
+      name: "Focus on the Family",
+      type: "Family",
+      desc: "Marriage, parenting, and youth resources",
+      cost: "Free / Paid",
+      link: "https://www.focusonthefamily.com",
+    },
+    {
+      name: "Faithlife / Logos Bible Software",
+      type: "Study",
+      desc: "Digital Bible library and study tools",
+      cost: "Paid / Free trial",
+      link: "https://www.logos.com",
+    },
+  ];
+
+  const groupByType = (items: { type: string }[]) => {
+    return items.reduce((acc: Record<string, any[]>, item: any) => {
+      acc[item.type] = acc[item.type] ? [...acc[item.type], item] : [item];
+      return acc;
+    }, {} as Record<string, any[]>);
+  };
+
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      resource.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || resource.category === selectedCategory;
     const matchesType = selectedType === "all" || resource.type === selectedType;
     return matchesSearch && matchesCategory && matchesType;
@@ -200,7 +327,7 @@ export default function ChristianCataloguePage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -226,13 +353,21 @@ export default function ChristianCataloguePage() {
           >
             {/* Search Bar */}
             <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <button
+                type="button"
+                aria-label="Search"
+                onClick={() => searchInputRef.current?.focus()}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 border border-white/20 shadow-sm transition-colors"
+              >
+                <Search className="text-white w-4 h-4" />
+              </button>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search resources, authors, or topics..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/20 dark:bg-black/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
+                className="w-full pl-14 pr-4 py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
               />
             </div>
 
@@ -244,11 +379,10 @@ export default function ChristianCataloguePage() {
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                      selectedCategory === category.id
-                        ? "bg-emerald-400 text-white font-semibold"
-                        : "bg-white/20 text-white hover:bg-white/30"
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${selectedCategory === category.id
+                      ? "bg-emerald-400 text-white font-semibold"
+                      : "bg-white/20 text-white hover:bg-white/30"
+                      }`}
                   >
                     <IconComponent className="w-4 h-4" />
                     {category.name}
@@ -263,11 +397,10 @@ export default function ChristianCataloguePage() {
                 <button
                   key={type.id}
                   onClick={() => setSelectedType(type.id)}
-                  className={`px-4 py-2 rounded-full transition-all duration-300 ${
-                    selectedType === type.id
-                      ? "bg-faith-gold text-faith-blue font-semibold"
-                      : "bg-white/20 text-white hover:bg-white/30"
-                  }`}
+                  className={`px-4 py-2 rounded-full transition-all duration-300 ${selectedType === type.id
+                    ? "bg-faith-gold text-faith-blue font-semibold"
+                    : "bg-white/20 text-white hover:bg-white/30"
+                    }`}
                 >
                   {type.name}
                 </button>
@@ -374,45 +507,159 @@ export default function ChristianCataloguePage() {
         </div>
       </section>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10">
-        <div className="flex justify-around items-center py-3">
-          <Link href="/" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Church size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Home</span>
-          </Link>
-          
-          <Link href="/dashboard" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Building2 size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Dashboard</span>
-          </Link>
-          
-          <Link href="/about" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Info size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">About</span>
-          </Link>
-          
-          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <User size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
-          </Link>
-          
-          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <BookOpen size={20} className="text-green-400" />
-            </div>
-            <span className="text-xs text-green-400 font-medium">Catalogue</span>
-          </Link>
+      {/* Faith Resources (External) */}
+      <section className="py-10 bg-white/10 dark:bg-black/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold text-white mb-6">Faith Resources</h2>
+
+          {/* South African Resources grouped by type */}
+          <div className="mb-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-6">🇿🇦 South African Resources</h3>
+            {Object.entries(groupByType(saResources)).map(([type, items]) => (
+              <div key={type} className="mb-8">
+                <h4 className="text-base font-semibold text-white/80 mb-4">{type}</h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {(items as any[]).map((r, index) => {
+                    const TypeIcon = getTypeIcon("tools");
+                    const isFree = r.cost === "Free" || r.cost.includes("Free");
+                    return (
+                      <motion.div
+                        key={r.name}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 hover:scale-105"
+                      >
+                        {/* Resource Image */}
+                        <div className="w-full h-48 bg-gradient-to-br from-emerald-400/20 to-faith-blue/20 rounded-xl mb-4 flex items-center justify-center">
+                          <TypeIcon className="w-16 h-16 text-emerald-400" />
+                        </div>
+
+                        {/* Resource Info */}
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-display font-bold text-white mb-1 line-clamp-2">{r.name}</h3>
+                              <p className="text-emerald-400 font-medium text-sm">{type}</p>
+                            </div>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(isFree ? "free" : "premium")} bg-white/10`}>
+                              {isFree ? "free" : "premium"}
+                            </span>
+                          </div>
+
+                          <p className="text-white/80 text-sm leading-relaxed line-clamp-3">{r.desc}</p>
+
+                          {/* Format and Details */}
+                          <div className="text-white/60 text-xs space-y-1">
+                            <div>Format: {type}</div>
+                            <div>Language: English</div>
+                          </div>
+
+                          {/* Price and Actions */}
+                          <div className="flex items-center justify-between pt-3 border-t border-white/20">
+                            <span className="text-lg font-bold text-faith-gold">{r.cost}</span>
+                            <div className="flex gap-2">
+                              <a
+                                href={r.link.startsWith('http') ? r.link : `https://${r.link}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-emerald-400 text-white font-semibold px-3 py-1 rounded-lg hover:bg-emerald-400/80 transition-colors text-sm"
+                              >
+                                {isFree ? "Visit" : "Visit"}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* International Resources grouped by type */}
+          <div>
+            <h3 className="text-lg font-semibold text-white/90 mb-6">🌐 International Resources</h3>
+            {Object.entries(groupByType(internationalResources)).map(([type, items]) => (
+              <div key={type} className="mb-8">
+                <h4 className="text-base font-semibold text-white/80 mb-4">{type}</h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {(items as any[]).map((r, index) => {
+                    const TypeIcon = getTypeIcon("tools");
+                    const isFree = r.cost === "Free" || r.cost.includes("Free");
+                    return (
+                      <motion.div
+                        key={r.name}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 hover:scale-105"
+                      >
+                        {/* Resource Image */}
+                        <div className="w-full h-48 bg-gradient-to-br from-emerald-400/20 to-faith-blue/20 rounded-xl mb-4 flex items-center justify-center">
+                          <TypeIcon className="w-16 h-16 text-emerald-400" />
+                        </div>
+
+                        {/* Resource Info */}
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-display font-bold text-white mb-1 line-clamp-2">{r.name}</h3>
+                              <p className="text-emerald-400 font-medium text-sm">{type}</p>
+                            </div>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(isFree ? "free" : "premium")} bg-white/10`}>
+                              {isFree ? "free" : "premium"}
+                            </span>
+                          </div>
+
+                          <p className="text-white/80 text-sm leading-relaxed line-clamp-3">{r.desc}</p>
+
+                          {/* Format and Details */}
+                          <div className="text-white/60 text-xs space-y-1">
+                            <div>Format: {type}</div>
+                            <div>Language: English</div>
+                          </div>
+
+                          {/* Price and Actions */}
+                          <div className="flex items-center justify-between pt-3 border-t border-white/20">
+                            <span className="text-lg font-bold text-faith-gold">{r.cost}</span>
+                            <div className="flex gap-2">
+                              <a
+                                href={r.link.startsWith('http') ? r.link : `https://${r.link}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-emerald-400 text-white font-semibold px-3 py-1 rounded-lg hover:bg-emerald-400/80 transition-colors text-sm"
+                              >
+                                {isFree ? "Visit" : "Visit"}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Google Maps Embed (replace YOUR_API_KEY before enabling) */}
+          {/* <div className="mt-12">
+            <h3 className="text-xl font-bold mb-4 text-white">Churches in Johannesburg</h3>
+            <iframe
+              width="100%"
+              height="500"
+              style={{ border: 0, borderRadius: "12px" }}
+              loading="lazy"
+              allowFullScreen
+              src="https://www.google.com/maps/embed/v1/search?key=YOUR_API_KEY&q=churches+in+Johannesburg+South+Africa"
+            />
+          </div> */}
         </div>
-      </nav>
+      </section>
+
+      {/* Footer handled globally by MobileNavigation */}
     </main>
   );
 }

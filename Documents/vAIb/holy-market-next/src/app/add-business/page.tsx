@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -29,17 +29,29 @@ import {
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function AddBusinessPage() {
   const { user, loading } = useAuth();
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Load persisted form data from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('businessProfile');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData(prev => ({ ...prev, ...parsed }));
+      }
+    } catch { }
+  }, []);
 
   const [formData, setFormData] = useState({
     // Business Information
     businessName: '',
-    businessType: '',
     category: '',
     description: '',
     foundedYear: '',
@@ -174,10 +186,17 @@ export default function AddBusinessPage() {
   ];
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value
+      };
+      // Persist to localStorage on every change
+      try {
+        localStorage.setItem('businessProfile', JSON.stringify(updated));
+      } catch { }
+      return updated;
+    });
 
     // Clear error when user starts typing
     if (errors[field]) {
@@ -258,7 +277,12 @@ export default function AddBusinessPage() {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Please fill in all required fields');
+      const firstError = Object.values(errors)[0];
+      if (firstError) {
+        toast.error(firstError);
+      } else {
+        toast.error('Please fill in all required fields');
+      }
       return;
     }
 
@@ -268,59 +292,17 @@ export default function AddBusinessPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      toast.success('Business profile created successfully!');
+      try {
+        localStorage.setItem('hasBusiness', 'true');
+        localStorage.setItem('businessProfile', JSON.stringify(formData));
+      } catch { }
+      // Redirect to dashboard (My Business tab) after successful submission
+      router.push('/dashboard?tab=business');
+      return;
 
-      // Reset form
-      setFormData({
-        businessName: '',
-        businessType: '',
-        category: '',
-        description: '',
-        foundedYear: '',
-        employees: '',
-        website: '',
-        ownerName: user?.name || '',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        whatsappNumber: '',
-        address: '',
-        city: '',
-        province: '',
-        postalCode: '',
-        country: 'South Africa',
-        faithAffirmation: false,
-        churchName: '',
-        christianDuration: '',
-        churchInvolvement: '',
-        missionStatement: '',
-        services: [],
-        customService: '',
-        facebook: '',
-        instagram: '',
-        linkedin: '',
-        twitter: '',
-        youtube: '',
-        tiktok: '',
-        profileImage: null,
-        businessImages: [],
-        businessHours: {
-          monday: { open: '', close: '', closed: false },
-          tuesday: { open: '', close: '', closed: false },
-          wednesday: { open: '', close: '', closed: false },
-          thursday: { open: '', close: '', closed: false },
-          friday: { open: '', close: '', closed: false },
-          saturday: { open: '', close: '', closed: false },
-          sunday: { open: '', close: '', closed: false }
-        },
-        paymentMethods: [],
-        languages: [],
-        certifications: '',
-        awards: '',
-        specialOffers: ''
-      });
 
     } catch (error) {
-      toast.error('Failed to create business profile. Please try again.');
+      // Error handling without toast
     } finally {
       setIsSubmitting(false);
     }
@@ -340,15 +322,15 @@ export default function AddBusinessPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-gray-200 dark:bg-gray-300 backdrop-blur-md border-b border-gray-300 dark:border-gray-400">
+        <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <ArrowLeft className="w-6 h-6 text-black" />
-              </Link>
+              <button onClick={() => router.back()} className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                <ArrowLeft className="w-6 h-6 text-white" />
+              </button>
               <div className="flex items-center space-x-2">
                 <Building2 className="w-8 h-8 text-faith-gold" />
-                <h1 className="text-2xl font-display font-bold text-black">
+                <h1 className="text-2xl font-display font-bold text-white">
                   Add Your Business
                 </h1>
               </div>
@@ -358,9 +340,8 @@ export default function AddBusinessPage() {
                 type="button"
                 onClick={() => formRef.current?.requestSubmit()}
                 disabled={isSubmitting}
-                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
-                  isSubmitting ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
-                }`}
+                className={`px-5 py-2 rounded-lg font-semibold transition-colors ${isSubmitting ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
+                  }`}
               >
                 {isSubmitting ? 'Saving…' : 'Save Changes'}
               </button>
@@ -422,45 +403,7 @@ export default function AddBusinessPage() {
           </div>
         </section>
 
-        {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-white/10 shadow-lg">
-          <div className="flex justify-around items-center py-3">
-            <Link href="/" className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <Church size={20} className="text-blue-600 dark:text-blue-400" />
-              </div>
-              <span className="text-xs text-gray-900 dark:text-blue-400 font-medium">Home</span>
-            </Link>
-
-            <Link href="/dashboard" className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <Building2 size={20} className="text-gray-600 dark:text-white" />
-              </div>
-              <span className="text-xs text-gray-900 dark:text-white font-medium">Dashboard</span>
-            </Link>
-
-            <Link href="/about" className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <Info size={20} className="text-gray-600 dark:text-white" />
-              </div>
-              <span className="text-xs text-gray-900 dark:text-white font-medium">About</span>
-            </Link>
-
-            <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <User size={20} className="text-gray-600 dark:text-white" />
-              </div>
-              <span className="text-xs text-gray-900 dark:text-white font-medium">Browse</span>
-            </Link>
-
-            <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <BookOpen size={20} className="text-green-600 dark:text-green-400" />
-              </div>
-              <span className="text-xs text-gray-900 dark:text-green-400 font-medium">Catalogue</span>
-            </Link>
-          </div>
-        </nav>
+        {/* Footer handled globally by MobileNavigation */}
       </div>
     );
   }
@@ -468,15 +411,15 @@ export default function AddBusinessPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-6 h-6 text-faith-blue dark:text-white" />
-            </Link>
+            <button onClick={() => router.back()} className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+              <ArrowLeft className="w-6 h-6 text-white" />
+            </button>
             <div className="flex items-center space-x-2">
               <Building2 className="w-8 h-8 text-faith-gold" />
-              <h1 className="text-2xl font-display font-bold text-faith-blue dark:text-white">
+              <h1 className="text-2xl font-display font-bold text-white">
                 Add Your Business
               </h1>
             </div>
@@ -485,14 +428,14 @@ export default function AddBusinessPage() {
       </header>
 
       {/* Form Content */}
-      <section className="py-8">
+      <section className="py-8 pb-32">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto"
           >
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {/* Business Information Section */}
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                 <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
@@ -513,16 +456,7 @@ export default function AddBusinessPage() {
                     {errors.businessName && <p className="text-red-400 text-sm mt-1">{errors.businessName}</p>}
                   </div>
 
-                  <div>
-                    <label className="block text-white font-medium mb-2">Business Type</label>
-                    <input
-                      type="text"
-                      value={formData.businessType}
-                      onChange={(e) => handleInputChange('businessType', e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-faith-gold"
-                      placeholder="e.g., Sole Proprietorship, Partnership, Company"
-                    />
-                  </div>
+
 
                   <div>
                     <label className="block text-white font-medium mb-2">Category *</label>
@@ -541,15 +475,21 @@ export default function AddBusinessPage() {
 
                   <div>
                     <label className="block text-white font-medium mb-2">Founded Year</label>
-                    <input
-                      type="number"
+                    <select
                       value={formData.foundedYear}
                       onChange={(e) => handleInputChange('foundedYear', e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-faith-gold"
-                      placeholder="e.g., 2020"
-                      min="1900"
-                      max={new Date().getFullYear()}
-                    />
+                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-faith-gold"
+                    >
+                      <option value="">Select year</option>
+                      {Array.from({ length: 201 }).map((_, idx) => {
+                        const year = new Date().getFullYear() - idx;
+                        return (
+                          <option key={year} value={String(year)} className="bg-gray-800">
+                            {year}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
 
                   <div>
@@ -749,7 +689,7 @@ export default function AddBusinessPage() {
                     </div>
 
                     <div>
-                      <label className="block text-white font-medium mb-2">How long have you been a Christian?</label>
+                      <label className="block text-white font-medium mb-2">How long have you been a Christian? (Optional)</label>
                       <select
                         value={formData.christianDuration}
                         onChange={(e) => handleInputChange('christianDuration', e.target.value)}
@@ -764,7 +704,7 @@ export default function AddBusinessPage() {
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-2">Church Involvement</label>
+                    <label className="block text-white font-medium mb-2">Church Involvement (Optional)</label>
                     <textarea
                       value={formData.churchInvolvement}
                       onChange={(e) => handleInputChange('churchInvolvement', e.target.value)}
@@ -775,7 +715,7 @@ export default function AddBusinessPage() {
                   </div>
 
                   <div>
-                    <label className="block text-white font-medium mb-2">Mission Statement</label>
+                    <label className="block text-white font-medium mb-2">Mission Statement (Optional)</label>
                     <textarea
                       value={formData.missionStatement}
                       onChange={(e) => handleInputChange('missionStatement', e.target.value)}
@@ -927,7 +867,7 @@ export default function AddBusinessPage() {
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                 <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
                   <Info className="w-6 h-6 text-faith-gold" />
-                  Additional Information
+                  Additional Information (Optional)
                 </h2>
 
                 <div className="space-y-6">
@@ -1011,25 +951,22 @@ export default function AddBusinessPage() {
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center mt-8 mb-8">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`flex items-center gap-2 px-8 py-4 font-semibold rounded-lg transition-colors ${isSubmitting
-                    ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                    : 'bg-faith-gold text-faith-blue hover:bg-faith-gold/80'
+                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-faith-gold focus:ring-offset-2 ${isSubmitting
+                    ? 'bg-white/20 text-white/50 cursor-not-allowed border border-white/10'
+                    : 'bg-purple-600 hover:bg-purple-700 text-white border border-white/20 shadow-xl hover:shadow-2xl'
                     }`}
                 >
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Saving changes...
+                      Submitting…
                     </>
                   ) : (
-                    <>
-                      <Check className="w-5 h-5" />
-                      Save Changes
-                    </>
+                    <>Submit</>
                   )}
                 </button>
               </div>
@@ -1038,45 +975,9 @@ export default function AddBusinessPage() {
         </div>
       </section>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-white/10 shadow-lg">
-        <div className="flex justify-around items-center py-3">
-          <Link href="/" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Church size={20} className="text-blue-600 dark:text-blue-400" />
-            </div>
-            <span className="text-xs text-gray-900 dark:text-blue-400 font-medium">Home</span>
-          </Link>
 
-          <Link href="/dashboard" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Building2 size={20} className="text-gray-600 dark:text-white" />
-            </div>
-            <span className="text-xs text-gray-900 dark:text-white font-medium">Dashboard</span>
-          </Link>
 
-          <Link href="/about" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Info size={20} className="text-gray-600 dark:text-white" />
-            </div>
-            <span className="text-xs text-gray-900 dark:text-white font-medium">About</span>
-          </Link>
-
-          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <User size={20} className="text-gray-600 dark:text-white" />
-            </div>
-            <span className="text-xs text-gray-900 dark:text-white font-medium">Browse</span>
-          </Link>
-
-          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <BookOpen size={20} className="text-green-600 dark:text-green-400" />
-            </div>
-            <span className="text-xs text-gray-900 dark:text-green-400 font-medium">Catalogue</span>
-          </Link>
-        </div>
-      </nav>
+      {/* Footer handled globally by MobileNavigation */}
     </div>
   );
 }
