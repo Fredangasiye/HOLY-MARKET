@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const { user, updateUserProfile, updateProfileImage, signOut, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [userData, setUserData] = useState({
@@ -62,6 +63,11 @@ export default function ProfilePage() {
     };
     setUserData(hydrated);
     setEditData(hydrated);
+    
+    // Clear preview when user photo updates from context
+    if (user.profilePhoto && photoPreview) {
+      setPhotoPreview(null);
+    }
   }, [user]);
 
   const handleSave = async () => {
@@ -103,10 +109,8 @@ export default function ProfilePage() {
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
-      if (dataUrl && user) {
-        // Update user state immediately for preview
-        const updatedUser = { ...user, profilePhoto: dataUrl };
-        // Force re-render by updating user context
+      if (dataUrl) {
+        setPhotoPreview(dataUrl);
         if (typeof window !== 'undefined') {
           localStorage.setItem('profilePhoto', dataUrl);
         }
@@ -118,7 +122,9 @@ export default function ProfilePage() {
     setIsUploadingPhoto(false);
     if (ok) {
       // Photo updated successfully - user state will update via auth context
+      // Keep preview until user state updates
     } else {
+      setPhotoPreview(null);
       toast.error('Failed to update photo. Please try again.');
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -185,9 +191,9 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <div className="relative mr-4">
-                  {user?.profilePhoto ? (
+                  {(photoPreview || user?.profilePhoto) ? (
                     <img 
-                      src={user.profilePhoto} 
+                      src={photoPreview || user?.profilePhoto || ''} 
                       alt="Profile" 
                       className="w-16 h-16 rounded-full object-cover border-2 border-blue-500" 
                       onError={(e) => {
@@ -196,8 +202,7 @@ export default function ProfilePage() {
                         if (localPhoto) {
                           (e.target as HTMLImageElement).src = localPhoto;
                         } else {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                          setPhotoPreview(null);
                         }
                       }}
                     />
