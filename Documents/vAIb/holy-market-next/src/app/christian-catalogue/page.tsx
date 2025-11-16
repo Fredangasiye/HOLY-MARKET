@@ -433,21 +433,28 @@ export default function ChristianCataloguePage() {
             </div>
             
             <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="w-full h-[500px] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src="https://www.google.com/maps/embed/v1/search?key=AIzaSyDcka9QoUd7D-UVNzdAWt05ITHFE07yVtQ&q=churches+in+South+Africa&zoom=6"
-                  className="w-full h-full"
-                />
+              <div className="w-full h-[500px] rounded-xl overflow-hidden bg-gradient-to-br from-emerald-400/20 to-faith-blue/20 flex items-center justify-center relative">
+                <div className="text-center z-10 p-8">
+                  <Church className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+                  <h3 className="text-2xl font-display font-bold text-white mb-2">Find Churches in South Africa</h3>
+                  <p className="text-white/80 mb-6">Explore Christian churches across the country</p>
+                  <a 
+                    href="https://www.google.com/maps/search/churches+in+South+Africa" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors font-semibold shadow-lg hover:shadow-xl"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                    Open Google Maps
+                  </a>
+                </div>
+                <div className="absolute inset-0 opacity-10">
+                  <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTAgMTBjLTIyIDAtNDAgMTgtNDAgNDBzMTggNDAgNDAgNDAgNDAtMTggNDAtNDAtMTgtNDAtNDAtNDB6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvc3ZnPg==')]"></div>
+                </div>
               </div>
               <div className="mt-4 text-center">
                 <p className="text-white/70 text-sm">
-                  Use the map above to explore churches across South Africa. Zoom in to see churches in your area.
+                  Click the button above to search for churches in South Africa on Google Maps. You can filter by location, denomination, and more.
                 </p>
               </div>
             </div>
