@@ -286,9 +286,7 @@ export default function ChristianCataloguePage() {
           >
             {/* Search Bar */}
             <div className="relative mb-6">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                <Search className="text-white w-5 h-5 opacity-90" />
-              </div>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white w-5 h-5 pointer-events-none" />
               <input
                 ref={searchInputRef}
                 type="text"
