@@ -432,7 +432,7 @@ export default function ChristianCataloguePage() {
             </div>
             
             <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
-              <div className="w-full h-[400px] sm:h-[500px] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+              <div className="w-full h-[400px] sm:h-[500px] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
                 <iframe
                   width="100%"
                   height="100%"
@@ -440,13 +440,14 @@ export default function ChristianCataloguePage() {
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/search?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDcka9QoUd7D-UVNzdAWt05ITHFE07yVtQ'}&q=churches+in+South+Africa&zoom=6`}
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3580.5!2d25.0!3d-29.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDAwJzAwLjAiUyAyNcKwMDAnMDAuMCJF!5e0!3m2!1sen!2sza!4v1234567890123!5m2!1sen!2sza"
                   className="w-full h-full"
+                  title="Churches in South Africa Map"
                 />
               </div>
               <div className="mt-4 text-center">
                 <p className="text-white/70 text-sm mb-3">
-                  Explore churches across South Africa. Zoom in to see churches in your area.
+                  Explore churches across South Africa. Use the map above or click the button below to search for churches.
                 </p>
                 <a 
                   href="https://www.google.com/maps/search/churches+in+South+Africa" 
@@ -455,7 +456,7 @@ export default function ChristianCataloguePage() {
                   className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors font-semibold shadow-lg hover:shadow-xl text-sm sm:text-base"
                 >
                   <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Open in Google Maps
+                  Search Churches on Google Maps
                 </a>
               </div>
             </div>

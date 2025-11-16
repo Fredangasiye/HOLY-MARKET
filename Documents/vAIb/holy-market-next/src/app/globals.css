@@ -28,6 +28,7 @@ body {
   -webkit-overflow-scrolling: touch;
   /* Ensure space for fixed footer (MobileNavigation) */
   padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
+  min-height: 100vh;
 }
 
 html,
