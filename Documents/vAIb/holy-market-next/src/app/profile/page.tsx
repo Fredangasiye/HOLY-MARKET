@@ -163,12 +163,12 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
       {/* Header with Back */}
       <header className="relative p-6 pt-12">
-        <div className="absolute left-4 top-12">
+        <div className="absolute left-4 top-12 z-10">
           <Link
             href={typeof document !== 'undefined' && document.referrer.includes('/dashboard') ? '/dashboard' : '/'}
-            className="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20"
+            className="p-2.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 shadow-lg transition-all"
           >
-            <ArrowLeft className="w-5 h-5 text-black dark:text-white" />
+            <ArrowLeft className="w-6 h-6 text-white" strokeWidth={2.5} />
           </Link>
         </div>
         <motion.div
@@ -193,23 +193,31 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <div className="relative mr-4">
-                  {(photoPreview || user?.profilePhoto) ? (
+                  {(photoPreview || user?.profilePhoto || (typeof window !== 'undefined' && localStorage.getItem('profilePhoto'))) ? (
                     <img 
-                      src={photoPreview || user?.profilePhoto || ''} 
+                      src={photoPreview || user?.profilePhoto || (typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : '') || ''} 
                       alt="Profile" 
-                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-500" 
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-3 border-blue-500 shadow-lg" 
                       onError={(e) => {
                         // Fallback to localStorage if Firebase URL fails
                         const localPhoto = typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : null;
-                        if (localPhoto) {
+                        if (localPhoto && (e.target as HTMLImageElement).src !== localPhoto) {
                           (e.target as HTMLImageElement).src = localPhoto;
                         } else {
-                          setPhotoPreview(null);
+                          // Show initial if all fail
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          const parent = (e.target as HTMLImageElement).parentElement;
+                          if (parent && !parent.querySelector('.profile-initial')) {
+                            const initial = document.createElement('div');
+                            initial.className = 'profile-initial w-20 h-20 sm:w-24 sm:h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold';
+                            initial.textContent = ((userData.firstName[0] || "") + (userData.lastName[0] || "")).toUpperCase() || 'U';
+                            parent.appendChild(initial);
+                          }
                         }
                       }}
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                       {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
                     </div>
                   )}
@@ -235,21 +243,37 @@ export default function ProfilePage() {
             {isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Profile Photo
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      {(photoPreview || user?.profilePhoto || (typeof window !== 'undefined' && localStorage.getItem('profilePhoto'))) ? (
+                        <img 
+                          src={photoPreview || user?.profilePhoto || (typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : '') || ''} 
+                          alt="Current" 
+                          className="w-16 h-16 rounded-full object-cover border-2 border-blue-500 shadow-md"
+                          onError={(e) => {
+                            const localPhoto = typeof window !== 'undefined' ? localStorage.getItem('profilePhoto') : null;
+                            if (localPhoto && (e.target as HTMLImageElement).src !== localPhoto) {
+                              (e.target as HTMLImageElement).src = localPhoto;
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                          {(userData.firstName[0] || "").toUpperCase()}{(userData.lastName[0] || "").toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={onPickPhoto}
                       disabled={isUploadingPhoto}
-                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg disabled:opacity-50"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 font-medium"
                     >
                       {isUploadingPhoto ? 'Uploading…' : 'Change Photo'}
                     </button>
-                    {user?.profilePhoto && (
-                      <img src={user.profilePhoto} alt="Current" className="w-10 h-10 rounded-full object-cover" />
-                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
