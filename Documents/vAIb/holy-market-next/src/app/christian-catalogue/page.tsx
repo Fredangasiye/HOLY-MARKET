@@ -286,8 +286,8 @@ export default function ChristianCataloguePage() {
           >
             {/* Search Bar */}
             <div className="relative mb-4 sm:mb-6">
-              <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                <Search className="text-white w-5 h-5 sm:w-5 sm:h-5" strokeWidth={2.5} />
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <Search className="text-white w-5 h-5 opacity-90" strokeWidth={2.5} />
               </div>
               <input
                 ref={searchInputRef}
@@ -295,7 +295,7 @@ export default function ChristianCataloguePage() {
                 placeholder="Search resources..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 sm:pl-12 pr-4 py-3.5 sm:py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border-2 border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400/50 text-base sm:text-base"
+                className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-full bg-white/15 dark:bg-black/30 backdrop-blur-md border-2 border-white/40 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400/70 text-base shadow-lg"
               />
             </div>
 
