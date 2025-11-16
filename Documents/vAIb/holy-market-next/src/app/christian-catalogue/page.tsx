@@ -285,33 +285,34 @@ export default function ChristianCataloguePage() {
             className="max-w-4xl mx-auto"
           >
             {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white w-5 h-5 pointer-events-none" />
+            <div className="relative mb-4 sm:mb-6">
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 text-white w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search resources, authors, or topics..."
+                placeholder="Search resources..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-sm sm:text-base"
               />
             </div>
 
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-3 mb-4">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
               {categories.map((category) => {
                 const IconComponent = category.icon;
                 return (
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${selectedCategory === category.id
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-300 text-xs sm:text-sm ${selectedCategory === category.id
                       ? "bg-emerald-400 text-white font-semibold"
                       : "bg-white/20 text-white hover:bg-white/30"
                       }`}
                   >
-                    <IconComponent className="w-4 h-4" />
-                    {category.name}
+                    <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="hidden xs:inline">{category.name}</span>
+                    <span className="xs:hidden">{category.name.split(' ')[0]}</span>
                   </button>
                 );
               })}
@@ -430,30 +431,32 @@ export default function ChristianCataloguePage() {
               <p className="text-white/80 text-lg">Find Christian churches near you</p>
             </div>
             
-            <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="w-full h-[500px] rounded-xl overflow-hidden bg-gradient-to-br from-emerald-400/20 to-faith-blue/20 flex items-center justify-center relative">
-                <div className="text-center z-10 p-8">
-                  <Church className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-                  <h3 className="text-2xl font-display font-bold text-white mb-2">Find Churches in South Africa</h3>
-                  <p className="text-white/80 mb-6">Explore Christian churches across the country</p>
-                  <a 
-                    href="https://www.google.com/maps/search/churches+in+South+Africa" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors font-semibold shadow-lg hover:shadow-xl"
-                  >
-                    <ExternalLink className="w-5 h-5" />
-                    Open Google Maps
-                  </a>
-                </div>
-                <div className="absolute inset-0 opacity-10">
-                  <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTAgMTBjLTIyIDAtNDAgMTgtNDAgNDBzMTggNDAgNDAgNDAgNDAtMTggNDAtNDAtMTgtNDAtNDAtNDB6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvc3ZnPg==')]"></div>
-                </div>
+            <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
+              <div className="w-full h-[400px] sm:h-[500px] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://www.google.com/maps/embed/v1/search?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDcka9QoUd7D-UVNzdAWt05ITHFE07yVtQ'}&q=churches+in+South+Africa&zoom=6`}
+                  className="w-full h-full"
+                />
               </div>
               <div className="mt-4 text-center">
-                <p className="text-white/70 text-sm">
-                  Click the button above to search for churches in South Africa on Google Maps. You can filter by location, denomination, and more.
+                <p className="text-white/70 text-sm mb-3">
+                  Explore churches across South Africa. Zoom in to see churches in your area.
                 </p>
+                <a 
+                  href="https://www.google.com/maps/search/churches+in+South+Africa" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors font-semibold shadow-lg hover:shadow-xl text-sm sm:text-base"
+                >
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Open in Google Maps
+                </a>
               </div>
             </div>
           </motion.div>

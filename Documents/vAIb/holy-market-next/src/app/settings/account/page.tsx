@@ -81,19 +81,19 @@ export default function AccountSettingsPage() {
 
     return (
         <div className="min-h-screen bg-black">
-            <header className="relative p-6 pt-12">
+            <header className="relative p-4 sm:p-6 pt-12">
                 <div className="flex items-center justify-between">
                     <Link href="/dashboard" className="p-2 bg-white/20 rounded-full">
-                        <ArrowLeft size={24} className="text-white" />
+                        <ArrowLeft size={20} className="sm:w-6 sm:h-6 text-white" />
                     </Link>
-                    <h1 className="text-2xl font-bold text-white">Account Settings</h1>
-                    <div className="w-10" />
+                    <h1 className="text-lg sm:text-2xl font-bold text-white text-center flex-1">Account Settings</h1>
+                    <div className="w-10 sm:w-10" />
                 </div>
             </header>
 
-            <main className="bg-white rounded-t-3xl p-6 min-h-[80vh]">
-                <div className="max-w-2xl mx-auto space-y-6">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-gray-200 p-6">
+            <main className="bg-white rounded-t-3xl p-4 sm:p-6 min-h-[80vh] pb-32">
+                <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
                         <h2 className="text-lg font-semibold mb-4">Profile</h2>
                         <div className="space-y-4">
                             <div>
@@ -135,11 +135,11 @@ export default function AccountSettingsPage() {
                                     </div>
                                 </>
                             )}
-                            <div className="flex gap-3">
-                                <button onClick={onSave} disabled={saving} className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300">
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button onClick={onSave} disabled={saving} className="w-full sm:w-auto px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 text-sm sm:text-base">
                                     {saving ? "Saving..." : "Save Changes"}
                                 </button>
-                                <button onClick={onPasswordReset} className="px-4 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 flex items-center gap-2">
+                                <button onClick={onPasswordReset} className="w-full sm:w-auto px-4 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 flex items-center justify-center gap-2 text-sm sm:text-base">
                                     <Lock size={18} /> Send Password Reset
                                 </button>
                             </div>

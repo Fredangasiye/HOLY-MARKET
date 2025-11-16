@@ -239,9 +239,9 @@ export default function DashboardPage() {
               className="space-y-6"
             >
               {/* Profile Header Card */}
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 ring-4 ring-faith-gold/60 flex-shrink-0">
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 ring-4 ring-faith-gold/60 flex-shrink-0 mx-auto sm:mx-0">
                     {user?.profilePhoto ? (
                       <img 
                         src={user.profilePhoto} 
@@ -261,27 +261,27 @@ export default function DashboardPage() {
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-2 truncate">{user?.name || 'User'}</h2>
+                  <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-white mb-2 break-words sm:truncate">{user?.name || 'User'}</h2>
                     <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-white/80">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 text-white/80">
                         <Mail className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm md:text-base truncate">{user?.email || 'user@example.com'}</span>
+                        <span className="text-xs sm:text-sm md:text-base break-all sm:truncate">{user?.email || 'user@example.com'}</span>
                       </div>
                       {user?.phone && (
-                        <div className="flex items-center gap-2 text-white/70">
+                        <div className="flex items-center justify-center sm:justify-start gap-2 text-white/70">
                           <Phone className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-sm md:text-base">{user.phone}</span>
+                          <span className="text-xs sm:text-sm md:text-base">{user.phone}</span>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-white/60">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 text-white/60">
                         <Calendar className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-xs md:text-sm">Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
+                        <span className="text-xs sm:text-sm">Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}</span>
                       </div>
                     </div>
                     <button
                       onClick={handleEditProfile}
-                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-faith-gold text-faith-blue font-semibold hover:bg-faith-gold/80 transition-colors shadow-lg hover:shadow-xl"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-faith-gold text-faith-blue font-semibold hover:bg-faith-gold/80 transition-colors shadow-lg hover:shadow-xl text-sm sm:text-base"
                     >
                       <Edit className="w-4 h-4" />
                       Edit Profile
@@ -291,12 +291,12 @@ export default function DashboardPage() {
               </div>
 
               {/* Account Info Card */}
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                <h3 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
-                  <User className="w-5 h-5 text-faith-gold" />
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                <h3 className="text-lg sm:text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-faith-gold" />
                   Account Information
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                     <div className="text-2xl font-bold text-faith-gold mb-1">{hasBusiness ? '1' : '0'}</div>
                     <div className="text-xs text-white/70 uppercase tracking-wide">Businesses</div>
@@ -327,9 +327,9 @@ export default function DashboardPage() {
               </div>
 
               {/* Quick Actions Card */}
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   {[
                     { icon: Settings, title: 'Account Settings', href: '/settings/account' },
                     { icon: Building2, title: 'My Businesses', href: '/company' },
@@ -370,37 +370,37 @@ export default function DashboardPage() {
               ) : (
                 <>
                   {/* Business Header Card */}
-                  <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                      <div className="w-32 h-32 rounded-xl overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 flex-shrink-0 flex items-center justify-center">
-                        <Building2 className="w-16 h-16 text-faith-gold" />
+                  <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 flex-shrink-0 flex items-center justify-center mx-auto sm:mx-0">
+                        <Building2 className="w-12 h-12 sm:w-16 sm:h-16 text-faith-gold" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1 min-w-0">
-                            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-2 truncate">{business?.businessName || 'Your Business'}</h2>
+                      <div className="flex-1 min-w-0 w-full">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+                          <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-white mb-2 break-words sm:truncate">{business?.businessName || 'Your Business'}</h2>
                             <div className="space-y-2 mb-4">
-                              <div className="flex items-center gap-2 text-emerald-400 font-medium">
+                              <div className="flex items-center justify-center sm:justify-start gap-2 text-emerald-400 font-medium">
                                 <Building2 className="w-4 h-4 flex-shrink-0" />
-                                <span className="text-sm md:text-base">{business?.category || 'Category not set'}</span>
+                                <span className="text-xs sm:text-sm md:text-base">{business?.category || 'Category not set'}</span>
                               </div>
                               {business?.city && business?.province && (
-                                <div className="flex items-center gap-2 text-white/70">
+                                <div className="flex items-center justify-center sm:justify-start gap-2 text-white/70">
                                   <MapPin className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-sm md:text-base">{business.city}, {business.province}</span>
+                                  <span className="text-xs sm:text-sm md:text-base">{business.city}, {business.province}</span>
                                 </div>
                               )}
                               {business?.foundedYear && (
-                                <div className="flex items-center gap-2 text-white/60">
+                                <div className="flex items-center justify-center sm:justify-start gap-2 text-white/60">
                                   <Calendar className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-xs md:text-sm">Founded {business.foundedYear}</span>
+                                  <span className="text-xs sm:text-sm">Founded {business.foundedYear}</span>
                                 </div>
                               )}
                             </div>
                           </div>
                           <button
                             onClick={handleEditBusiness}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-faith-gold text-faith-blue font-semibold hover:bg-faith-gold/80 transition-colors shadow-lg flex-shrink-0"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-faith-gold text-faith-blue font-semibold hover:bg-faith-gold/80 transition-colors shadow-lg text-sm sm:text-base"
                           >
                             <Edit className="w-4 h-4" />
                             Edit
@@ -411,9 +411,9 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Business Details Card */}
-                  <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                    <h3 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
-                      <Info className="w-5 h-5 text-faith-gold" />
+                  <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                    <h3 className="text-lg sm:text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
+                      <Info className="w-4 h-4 sm:w-5 sm:h-5 text-faith-gold" />
                       Business Details
                     </h3>
                     {business?.description && (
@@ -441,10 +441,10 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Contact & Stats Card */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <Phone className="w-5 h-5 text-faith-gold" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                      <h3 className="text-base sm:text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-faith-gold" />
                         Contact Information
                       </h3>
                       <div className="space-y-3">
@@ -474,12 +474,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-faith-gold" />
+                    <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20 shadow-lg">
+                      <h3 className="text-base sm:text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-faith-gold" />
                         Business Stats
                       </h3>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                           <div className="text-2xl font-bold text-faith-gold mb-1">0</div>
                           <div className="text-xs text-white/70 uppercase tracking-wide">Projects</div>
