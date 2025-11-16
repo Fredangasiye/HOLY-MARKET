@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/auth-context";
 import ScrollToTop from "@/components/ScrollToTop";
+import MobileNavigation from "@/components/MobileNavigation";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -71,17 +72,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${poppins.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${poppins.variable} font-sans antialiased min-h-screen`}>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-2 rounded">Skip to content</a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <main id="main">
+            <main id="main" className="min-h-screen">
               {children}
             </main>
           </AuthProvider>
         </ThemeProvider>
         <Toaster position="bottom-center" />
         <ScrollToTop />
+        <MobileNavigation />
         <Analytics />
         <SpeedInsights />
       </body>

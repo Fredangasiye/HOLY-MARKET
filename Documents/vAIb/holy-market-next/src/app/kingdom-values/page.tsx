@@ -172,9 +172,9 @@ export default function KingdomValuesPage() {
                   <p className="text-faith-gold font-medium">{principle.verse}</p>
                 </div>
               </div>
-              
+
               <p className="text-white/80 mb-6 leading-relaxed">{principle.description}</p>
-              
+
               <div className="bg-white/5 rounded-lg p-4 border-l-4 border-faith-gold">
                 <Quote className="w-6 h-6 text-faith-gold mb-2" />
                 <p className="text-white/90 italic">"{principle.text}"</p>
@@ -250,7 +250,7 @@ export default function KingdomValuesPage() {
           >
             <h3 className="text-2xl font-display font-bold text-white mb-4">{leadership.title}</h3>
             <p className="text-white/80 mb-6 text-lg">{leadership.description}</p>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h4 className="text-lg font-semibold text-faith-gold mb-3">Key Characteristics:</h4>
@@ -263,7 +263,7 @@ export default function KingdomValuesPage() {
                   ))}
                 </ul>
               </div>
-              
+
               <div className="bg-white/5 rounded-lg p-4 border-l-4 border-faith-gold">
                 <p className="text-faith-gold font-medium mb-2">{leadership.verse}</p>
                 <p className="text-white/90 italic">"{leadership.text}"</p>
@@ -298,7 +298,7 @@ export default function KingdomValuesPage() {
             className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-faith-gold/50 transition-all duration-300"
           >
             <h3 className="text-2xl font-display font-bold text-white mb-6">{category.category}</h3>
-            
+
             <div className="space-y-6">
               {category.verses.map((verse, verseIndex) => (
                 <div key={verseIndex} className="bg-white/5 rounded-lg p-6 border-l-4 border-faith-gold">
@@ -316,7 +316,7 @@ export default function KingdomValuesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -342,11 +342,10 @@ export default function KingdomValuesPage() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
-                    activeSection === section.id
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeSection === section.id
                       ? "bg-faith-gold text-faith-blue font-semibold"
                       : "bg-white/20 text-white hover:bg-white/30"
-                  }`}
+                    }`}
                 >
                   <IconComponent className="w-4 h-4" />
                   {section.name}
@@ -376,28 +375,28 @@ export default function KingdomValuesPage() {
             </div>
             <span className="text-xs text-white font-medium">Home</span>
           </Link>
-          
+
           <Link href="/dashboard" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Building2 size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">Dashboard</span>
           </Link>
-          
+
           <Link href="/about" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Info size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">About</span>
           </Link>
-          
+
           <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <User size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
           </Link>
-          
+
           <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <BookOpen size={20} className="text-green-400" />

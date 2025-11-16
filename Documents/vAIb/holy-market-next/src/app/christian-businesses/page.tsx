@@ -3,14 +3,23 @@
 import { motion } from "framer-motion";
 import { Building2, Search, Filter, MapPin, Phone, Mail, Globe, Heart, Church, User, Info, BookOpen, ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "@/lib/auth-context";
 
 export default function ChristianBusinessesPage() {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleWhatsApp = (business: any) => {
+    const hasBusiness = typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true';
+    if (!user || !hasBusiness) {
+      toast.error('Add your business first to contact others via WhatsApp.');
+      window.location.href = '/add-business';
+      return;
+    }
     const message = `Hello! I'm interested in learning more about ${business.name}.`;
     const whatsappUrl = `https://wa.me/${business.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -140,8 +149,8 @@ export default function ChristianBusinessesPage() {
 
   const filteredBusinesses = businesses.filter(business => {
     const matchesSearch = business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         business.location.toLowerCase().includes(searchTerm.toLowerCase());
+      business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || business.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -149,15 +158,15 @@ export default function ChristianBusinessesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-6 h-6 text-faith-blue dark:text-white" />
+            <Link href="/" className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+              <ArrowLeft className="w-6 h-6 text-white" />
             </Link>
             <div className="flex items-center space-x-2">
               <Building2 className="w-8 h-8 text-faith-gold" />
-              <h1 className="text-2xl font-display font-bold text-faith-blue dark:text-white">
+              <h1 className="text-2xl font-display font-bold text-white">
                 Christian Businesses
               </h1>
             </div>
@@ -175,13 +184,21 @@ export default function ChristianBusinessesPage() {
           >
             {/* Search Bar */}
             <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <button
+                type="button"
+                aria-label="Search"
+                onClick={() => searchInputRef.current?.focus()}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 border border-white/20 shadow-sm transition-colors"
+              >
+                <Search className="text-white w-4 h-4" />
+              </button>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search businesses, locations, or services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/20 dark:bg-black/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-faith-gold focus:border-transparent"
+                className="w-full pl-14 pr-4 py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-faith-gold focus:border-transparent"
               />
             </div>
 
@@ -193,11 +210,10 @@ export default function ChristianBusinessesPage() {
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                      selectedCategory === category.id
-                        ? "bg-faith-gold text-faith-blue font-semibold"
-                        : "bg-white/20 text-white hover:bg-white/30"
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${selectedCategory === category.id
+                      ? "bg-faith-gold text-faith-blue font-semibold"
+                      : "bg-white/20 text-white hover:bg-white/30"
+                      }`}
                   >
                     <IconComponent className="w-4 h-4" />
                     {category.name}
@@ -328,28 +344,28 @@ export default function ChristianBusinessesPage() {
             </div>
             <span className="text-xs text-white font-medium">Home</span>
           </Link>
-          
+
           <Link href="/dashboard" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Building2 size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">Dashboard</span>
           </Link>
-          
+
           <Link href="/about" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <Info size={20} className="text-white" />
             </div>
             <span className="text-xs text-white font-medium">About</span>
           </Link>
-          
+
           <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <User size={20} className="text-blue-400" />
             </div>
             <span className="text-xs text-blue-400 font-medium">Browse Christian Businesses</span>
           </Link>
-          
+
           <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
             <div className="w-6 h-6 flex items-center justify-center">
               <BookOpen size={20} className="text-green-400" />

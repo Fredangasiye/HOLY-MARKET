@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -23,9 +23,22 @@ import {
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { user, signOut, updateUserProfile } = useAuth();
+  const router = useRouter();
+  const [business, setBusiness] = useState<any | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('businessProfile');
+      setBusiness(saved ? JSON.parse(saved) : null);
+    } catch { }
+  }, []);
+
   const [settings, setSettings] = useState({
     profileVisibility: true,
     contactInfoVisible: true,
@@ -40,13 +53,33 @@ export default function SettingsPage() {
   });
 
   const [userData, setUserData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+27 82 123 4567",
-    businessName: "Graceful Gardens",
-    website: "https://gracefulgardens.co.za",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    businessName: "",
+    website: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      const parts = (user.name || "").trim().split(" ");
+      setUserData(prev => ({
+        ...prev,
+        firstName: parts[0] || "",
+        lastName: parts.slice(1).join(" ") || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+    if (business) {
+      setUserData(prev => ({
+        ...prev,
+        businessName: business.businessName || "",
+        website: business.website || "",
+      }));
+    }
+  }, [user, business]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(userData);
@@ -60,39 +93,52 @@ export default function SettingsPage() {
   };
 
   const handleSaveSettings = () => {
-    toast.success("Settings saved successfully!");
+    // Save settings to localStorage
+    try {
+      localStorage.setItem('userSettings', JSON.stringify(settings));
+    } catch { }
   };
 
-  const handleSaveAccount = () => {
+  const handleSaveAccount = async () => {
+    if (!user) return;
     // Validate form
     const newErrors: Record<string, string> = {};
     if (!editData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!editData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!editData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(editData.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-    if (!editData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    }
 
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
-    setUserData(editData);
-    setIsEditing(false);
-    toast.success("Account information updated successfully!");
+    const fullName = [editData.firstName, editData.lastName].filter(Boolean).join(" ");
+    const ok = await updateUserProfile({ name: fullName, phone: editData.phone });
+    
+    if (ok) {
+      // Update business profile if changed
+      if (business && (editData.businessName !== business.businessName || editData.website !== business.website)) {
+        try {
+          const updatedBusiness = { ...business, businessName: editData.businessName, website: editData.website };
+          localStorage.setItem('businessProfile', JSON.stringify(updatedBusiness));
+          setBusiness(updatedBusiness);
+        } catch { }
+      }
+      setUserData(editData);
+      setIsEditing(false);
+    } else {
+      toast.error("Failed to update account. Please try again.");
+    }
   };
 
-  const handleLogout = () => {
-    toast.success("Logged out successfully!");
-    // Add logout logic here
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/");
   };
 
   const handleDeleteAccount = () => {
     if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      toast.success("Account deletion request submitted. Please contact support for assistance.");
+      toast.error("Please contact support at help@holymarket.co.za to delete your account.");
     }
   };
 
@@ -191,7 +237,7 @@ export default function SettingsPage() {
             
             <div className="grid md:grid-cols-2 gap-4">
               <Link
-                href="#account-settings"
+                href="/settings/account"
                 className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center mb-4">
@@ -221,7 +267,7 @@ export default function SettingsPage() {
               </Link>
 
               <Link
-                href="#favorites"
+                href="/favorites"
                 className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center mb-4">
@@ -236,7 +282,7 @@ export default function SettingsPage() {
               </Link>
 
               <Link
-                href="#privacy-security"
+                href="/settings/privacy"
                 className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center mb-4">
@@ -494,21 +540,45 @@ export default function SettingsPage() {
                   icon={<HelpCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
                   title="Help & Support"
                   description="Get help or contact support"
-                  onPress={() => toast.info("Contact support at help@holymarket.co.za")}
+                  onPress={() => {
+                    window.location.href = "mailto:help@holymarket.co.za?subject=Support Request";
+                  }}
                 />
 
                 <ActionRow
                   icon={<FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
                   title="Privacy Policy / Terms of Service"
                   description="View our privacy policy and terms"
-                  onPress={() => toast.info("Legal documents available at holymarket.co.za/legal")}
+                  onPress={() => {
+                    window.open("https://holy-market-next.vercel.app/about", "_blank");
+                  }}
                 />
 
                 <ActionRow
                   icon={<Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
                   title="Download My Data"
                   description="Export your account data"
-                  onPress={() => toast.info("Data export feature in development")}
+                  onPress={() => {
+                    try {
+                      const userData = {
+                        profile: user,
+                        business: business,
+                        settings: settings
+                      };
+                      const dataStr = JSON.stringify(userData, null, 2);
+                      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                      const url = URL.createObjectURL(dataBlob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.download = `holymarket-data-${new Date().toISOString().split('T')[0]}.json`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(url);
+                    } catch (error) {
+                      toast.error("Failed to export data. Please try again.");
+                    }
+                  }}
                 />
 
                 <ActionRow

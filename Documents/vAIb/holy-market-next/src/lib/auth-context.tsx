@@ -14,7 +14,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { auth, googleProvider, db, storage } from './firebase';
 
 export interface User {
@@ -33,7 +33,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>, profileImage?: File) => Promise<boolean>;
+  signUp: (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password?: string }, profileImage?: File) => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
   signOut: () => Promise<void>;
   clearError: () => void;
@@ -58,9 +58,46 @@ const uploadImageToStorage = async (file: File, userId: string): Promise<string>
   }
 
   const imageRef = ref(storage, `profile-images/${userId}/${Date.now()}-${file.name}`);
-  const snapshot = await uploadBytes(imageRef, file);
-  const downloadURL = await getDownloadURL(snapshot.ref);
-  return downloadURL;
+  const metadata = { contentType: file.type || 'image/jpeg' } as any;
+
+  // Use resumable upload to avoid hanging Promises and allow progress/cancellation if needed
+  const uploadTask = uploadBytesResumable(imageRef, file, metadata);
+
+  const url: string = await new Promise<string>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error('Upload timed out'));
+    }, 120000); // 120s safety timeout for slower networks
+
+    uploadTask.on(
+      'state_changed',
+      undefined,
+      (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          clearTimeout(timeoutId);
+          resolve(downloadURL);
+        } catch (err) {
+          clearTimeout(timeoutId);
+          reject(err as Error);
+        }
+      }
+    );
+  });
+
+  return url;
+};
+
+const readFileAsDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
 };
 
 const saveUserToFirestore = async (user: User) => {
@@ -232,7 +269,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setError(null);
       setLoading(true);
-      await sendPasswordResetEmail(auth, email);
+      const actionCodeSettings = {
+        // Ensure the reset flow returns to our site
+        url: `${typeof window !== 'undefined' ? window.location.origin : 'https://holy-market-next.vercel.app'}/auth/reset-password`,
+        handleCodeInApp: true,
+      } as const;
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
       return true;
     } catch (error: any) {
       setError(mapFirebaseError(error));
@@ -242,7 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>, profileImage?: File): Promise<boolean> => {
+  const signUp = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password?: string }, profileImage?: File): Promise<boolean> => {
     if (!auth) {
       setError('Firebase authentication not configured. Please contact support.');
       return false;
@@ -371,33 +413,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       setError(null);
-      setLoading(true);
 
-      // Upload new image
-      const profilePhotoUrl = await uploadImageToStorage(file, user.id);
+      let profilePhotoUrl: string | null = null;
+      try {
+        // Primary: upload to Firebase Storage
+        profilePhotoUrl = await uploadImageToStorage(file, user.id);
+      } catch (primaryErr) {
+        // Fallback: store locally as Data URL for immediate use
+        if (typeof window !== 'undefined') {
+          try {
+            profilePhotoUrl = await readFileAsDataUrl(file);
+          } catch (fallbackErr) {
+            // eslint-disable-next-line no-console
+            console.error('Local fallback failed:', fallbackErr);
+            throw primaryErr;
+          }
+        } else {
+          throw primaryErr;
+        }
+      }
 
-      // Update Firebase profile
-      await updateProfile(auth.currentUser!, {
-        photoURL: profilePhotoUrl,
-      });
+      // Best-effort auth profile update (safe even with data URL)
+      try {
+        await updateProfile(auth.currentUser!, { photoURL: profilePhotoUrl || '' });
+      } catch (authUpdateErr) {
+        if (typeof window !== 'undefined') {
+          // eslint-disable-next-line no-console
+          console.warn('Warning: failed to update Firebase Auth profile photoURL:', authUpdateErr);
+        }
+      }
 
-      // Update user object
       const updatedUser: User = {
         ...user,
-        profilePhoto: profilePhotoUrl,
+        profilePhoto: profilePhotoUrl || '',
         updatedAt: new Date(),
       };
 
-      // Save to Firestore
-      await saveUserToFirestore(updatedUser);
+      // Best-effort Firestore persistence
+      try {
+        await saveUserToFirestore(updatedUser);
+      } catch (persistErr) {
+        if (typeof window !== 'undefined') {
+          // eslint-disable-next-line no-console
+          console.warn('Warning: failed to persist profile to Firestore:', persistErr);
+        }
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('profilePhoto', updatedUser.profilePhoto || '');
+        } catch { }
+      }
       setUser(updatedUser);
 
       return true;
     } catch (error: any) {
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.error('Profile image upload failed:', error);
+      }
       setError(mapFirebaseError(error));
       return false;
     } finally {
-      setLoading(false);
+      // do not toggle global loading here to avoid blocking UI
     }
   };
 

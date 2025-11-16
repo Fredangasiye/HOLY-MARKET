@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Heart, Building2, MapPin, Phone, Mail, MessageCircle, Star } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useAuth } from "@/lib/auth-context";
 
 export default function FavoritesPage() {
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState([] as any[]);
 
   const removeFavorite = (id: string) => {
@@ -15,8 +17,14 @@ export default function FavoritesPage() {
   };
 
   const handleWhatsApp = (company: any) => {
+    const hasBusiness = typeof window !== 'undefined' && localStorage.getItem('hasBusiness') === 'true';
+    if (!user || !hasBusiness) {
+      toast.error('Add your business first to contact others via WhatsApp.');
+      window.location.href = '/add-business';
+      return;
+    }
     if (company.whatsappNumber) {
-      const message = encodeURIComponent(`Hi, I found your business ${company.businessName} on the Christian Business Network app. I'd like to learn more about your services.`);
+      const message = encodeURIComponent(`Hi, I found your business ${company.businessName} on HOLY-MARKET. I'd like to learn more about your services.`);
       window.open(`https://wa.me/${company.whatsappNumber.replace(/[^\d]/g, '')}?text=${message}`, '_blank');
     }
   };

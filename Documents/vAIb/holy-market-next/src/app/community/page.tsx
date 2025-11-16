@@ -155,7 +155,7 @@ export default function CommunityPage() {
             <div className="flex-1">
               <h3 className="text-xl font-display font-bold text-white mb-2">{event.title}</h3>
               <p className="text-white/80 mb-3">{event.description}</p>
-              
+
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div className="flex items-center gap-2 text-white/70">
                   <Calendar className="w-4 h-4" />
@@ -174,7 +174,7 @@ export default function CommunityPage() {
                   <span className="text-sm">{event.attendees}/{event.maxAttendees} attendees</span>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 bg-faith-gold/20 text-faith-gold rounded-full text-sm font-medium">
                   {event.type}
@@ -206,14 +206,14 @@ export default function CommunityPage() {
               {discussion.category}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-4 text-white/70 text-sm mb-3">
             <span>By {discussion.author}</span>
             <span>{discussion.replies} replies</span>
             <span>{discussion.views} views</span>
             <span>{discussion.lastActivity}</span>
           </div>
-          
+
           <button className="text-faith-gold hover:text-faith-gold/80 transition-colors text-sm font-medium">
             Join Discussion →
           </button>
@@ -236,7 +236,7 @@ export default function CommunityPage() {
             <div className="w-16 h-16 bg-gradient-to-br from-faith-gold/20 to-faith-blue/20 rounded-full flex items-center justify-center">
               <User className="w-8 h-8 text-faith-gold" />
             </div>
-            
+
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="text-xl font-display font-bold text-white">{mentor.name}</h3>
@@ -245,16 +245,16 @@ export default function CommunityPage() {
                   <span className="text-sm font-medium">{mentor.rating}</span>
                 </div>
               </div>
-              
+
               <p className="text-faith-gold font-medium mb-2">{mentor.title}</p>
               <p className="text-white/80 mb-3">{mentor.bio}</p>
-              
+
               <div className="flex items-center gap-4 text-white/70 text-sm mb-4">
                 <span>Expertise: {mentor.expertise}</span>
                 <span>Experience: {mentor.experience}</span>
                 <span>{mentor.sessions} sessions</span>
               </div>
-              
+
               <button className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors">
                 Request Mentorship
               </button>
@@ -279,14 +279,14 @@ export default function CommunityPage() {
             <div className="flex-1">
               <h3 className="text-xl font-display font-bold text-white mb-2">{group.name}</h3>
               <p className="text-white/80 mb-3">{group.description}</p>
-              
+
               <div className="flex items-center gap-4 text-white/70 text-sm mb-4">
                 <span>{group.members} members</span>
                 <span className="px-2 py-1 bg-faith-gold/20 text-faith-gold rounded-full text-xs font-medium">
                   {group.focus}
                 </span>
               </div>
-              
+
               <button className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors">
                 Join Group
               </button>
@@ -300,7 +300,7 @@ export default function CommunityPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-faith-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -313,7 +313,7 @@ export default function CommunityPage() {
               </h1>
             </div>
           </div>
-          
+
           <button className="bg-faith-gold text-faith-blue font-semibold px-4 py-2 rounded-lg hover:bg-faith-gold/80 transition-colors flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Create Event
@@ -331,11 +331,10 @@ export default function CommunityPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? "bg-faith-gold text-faith-blue font-semibold"
-                      : "bg-white/20 text-white hover:bg-white/30"
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${activeTab === tab.id
+                    ? "bg-faith-gold text-faith-blue font-semibold"
+                    : "bg-white/20 text-white hover:bg-white/30"
+                    }`}
                 >
                   <IconComponent className="w-4 h-4" />
                   {tab.name}
@@ -356,45 +355,7 @@ export default function CommunityPage() {
         </div>
       </section>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10">
-        <div className="flex justify-around items-center py-3">
-          <Link href="/" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Church size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Home</span>
-          </Link>
-          
-          <Link href="/dashboard" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Building2 size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Dashboard</span>
-          </Link>
-          
-          <Link href="/about" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Info size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">About</span>
-          </Link>
-          
-          <Link href="/christian-businesses" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <User size={20} className="text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Browse Christian Businesses</span>
-          </Link>
-          
-          <Link href="/christian-catalogue" className="flex flex-col items-center gap-1">
-            <div className="w-6 h-6 flex items-center justify-center">
-              <BookOpen size={20} className="text-green-400" />
-            </div>
-            <span className="text-xs text-green-400 font-medium">Catalogue</span>
-          </Link>
-        </div>
-      </nav>
+      {/* Footer handled globally by MobileNavigation */}
     </main>
   );
 }

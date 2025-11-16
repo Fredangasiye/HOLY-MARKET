@@ -23,10 +23,36 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Mobile scroll improvements */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure space for fixed footer (MobileNavigation) */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* iOS Safari fill available height */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Typography improvements */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-poppins), system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -49,7 +75,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
