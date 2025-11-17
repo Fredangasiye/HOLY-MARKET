@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import toast from "react-hot-toast";
-import CrossDollarIcon from "./CrossDollarIcon";
+import Image from "next/image";
 
 interface HeaderProps {
   title?: string;
@@ -40,7 +40,14 @@ export default function Header({ title, showBackButton = false, backPath }: Head
               <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
           )}
-          <CrossDollarIcon className="w-8 h-8 text-white" />
+          <Image 
+            src="/logo.svg" 
+            alt="HOLY-MARKET Logo" 
+            width={32} 
+            height={32} 
+            className="w-8 h-8"
+            style={{ filter: 'brightness(0) invert(1)' }}
+          />
           <h1 className="text-2xl font-display font-bold text-white">
             {title || "HOLY-MARKET"}
           </h1>
