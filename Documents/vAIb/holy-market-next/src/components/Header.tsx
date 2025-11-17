@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { X, User, Settings, LogIn, ArrowLeft } from "lucide-react";
+import { User, Settings, LogIn, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import toast from "react-hot-toast";
+import CrossDollarIcon from "./CrossDollarIcon";
 
 interface HeaderProps {
   title?: string;
@@ -39,7 +40,7 @@ export default function Header({ title, showBackButton = false, backPath }: Head
               <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
           )}
-          <X className="w-8 h-8 text-white" />
+          <CrossDollarIcon className="w-8 h-8 text-white" />
           <h1 className="text-2xl font-display font-bold text-white">
             {title || "HOLY-MARKET"}
           </h1>
