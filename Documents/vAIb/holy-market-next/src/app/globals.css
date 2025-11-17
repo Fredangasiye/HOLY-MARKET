@@ -86,3 +86,37 @@ h6 {
     scroll-behavior: auto !important;
   }
 }
+
+/* Fix mobile search input background */
+.search-input-mobile {
+  background-color: rgba(6, 78, 59, 0.6) !important;
+  border-color: rgba(52, 211, 153, 0.6) !important;
+  color: white !important;
+}
+
+.search-input-mobile::placeholder {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.search-input-mobile:-webkit-autofill,
+.search-input-mobile:-webkit-autofill:hover,
+.search-input-mobile:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(6, 78, 59, 0.6) inset !important;
+  box-shadow: 0 0 0px 1000px rgba(6, 78, 59, 0.6) inset !important;
+  background-color: rgba(6, 78, 59, 0.6) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-input-mobile {
+    background-color: rgba(2, 44, 34, 0.7) !important;
+  }
+  
+  .search-input-mobile:-webkit-autofill,
+  .search-input-mobile:-webkit-autofill:hover,
+  .search-input-mobile:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px rgba(2, 44, 34, 0.7) inset !important;
+    box-shadow: 0 0 0px 1000px rgba(2, 44, 34, 0.7) inset !important;
+    background-color: rgba(2, 44, 34, 0.7) !important;
+  }
+}
