@@ -87,36 +87,62 @@ h6 {
   }
 }
 
-/* Fix mobile search input background */
+/* Fix mobile search input background - HARD FIX */
+.search-input-wrapper {
+  background-color: rgba(6, 78, 59, 0.9) !important;
+  border-color: rgba(52, 211, 153, 0.7) !important;
+}
+
 .search-input-mobile {
-  background-color: rgba(6, 78, 59, 0.6) !important;
-  border-color: rgba(52, 211, 153, 0.6) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
   color: white !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white !important;
 }
 
 .search-input-mobile::placeholder {
   color: rgba(255, 255, 255, 0.9) !important;
+  opacity: 1 !important;
 }
 
 .search-input-mobile:-webkit-autofill,
 .search-input-mobile:-webkit-autofill:hover,
-.search-input-mobile:-webkit-autofill:focus {
+.search-input-mobile:-webkit-autofill:focus,
+.search-input-mobile:-webkit-autofill:active {
   -webkit-text-fill-color: white !important;
-  -webkit-box-shadow: 0 0 0px 1000px rgba(6, 78, 59, 0.6) inset !important;
-  box-shadow: 0 0 0px 1000px rgba(6, 78, 59, 0.6) inset !important;
-  background-color: rgba(6, 78, 59, 0.6) !important;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Prevent any white background from appearing */
+input[type="text"].search-input-mobile,
+input[type="search"].search-input-mobile {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .search-input-mobile {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background-color: transparent !important;
+  }
+  
+  .search-input-mobile:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    background-color: transparent !important;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
-  .search-input-mobile {
-    background-color: rgba(2, 44, 34, 0.7) !important;
-  }
-  
-  .search-input-mobile:-webkit-autofill,
-  .search-input-mobile:-webkit-autofill:hover,
-  .search-input-mobile:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px rgba(2, 44, 34, 0.7) inset !important;
-    box-shadow: 0 0 0px 1000px rgba(2, 44, 34, 0.7) inset !important;
-    background-color: rgba(2, 44, 34, 0.7) !important;
+  .search-input-wrapper {
+    background-color: rgba(2, 44, 34, 0.95) !important;
+    border-color: rgba(52, 211, 153, 0.8) !important;
   }
 }

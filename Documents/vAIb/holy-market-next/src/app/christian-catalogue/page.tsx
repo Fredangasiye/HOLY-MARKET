@@ -289,22 +289,19 @@ export default function ChristianCataloguePage() {
               <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
                 <Search className="text-white w-5 h-5 opacity-90" strokeWidth={2.5} />
               </div>
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                autoComplete="off"
-                className="search-input-mobile w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-full backdrop-blur-md border-2 text-white text-base shadow-lg"
-                style={{
-                  backgroundColor: 'rgba(6, 78, 59, 0.6)',
-                  borderColor: 'rgba(52, 211, 153, 0.6)',
-                  WebkitAppearance: 'none',
-                  appearance: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              />
+              <div className="search-input-wrapper rounded-full border-2 border-emerald-400/60 bg-emerald-900/80 shadow-lg">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search resources..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-form-type="other"
+                  className="search-input-mobile w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-full bg-transparent text-white text-base outline-none border-0"
+                />
+              </div>
             </div>
 
             {/* Category Filter */}
