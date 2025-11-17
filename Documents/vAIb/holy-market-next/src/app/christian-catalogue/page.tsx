@@ -295,7 +295,8 @@ export default function ChristianCataloguePage() {
                 placeholder="Search resources..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-full bg-white/15 dark:bg-black/30 backdrop-blur-md border-2 border-white/40 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400/70 text-base shadow-lg"
+                className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-full bg-emerald-900/40 dark:bg-emerald-950/50 backdrop-blur-md border-2 border-emerald-400/60 text-white placeholder-white/90 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400/80 text-base shadow-lg"
+                style={{ WebkitAppearance: 'none', appearance: 'none' }}
               />
             </div>
 
